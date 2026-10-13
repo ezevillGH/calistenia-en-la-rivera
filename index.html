@@ -1,0 +1,458 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0E3A44">
+<title>Calistenia en la Rivera</title>
+<link rel="icon" href="logo.webp">
+<link rel="apple-touch-icon" href="logo.webp">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Calistenia">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700&family=Barlow:wght@400;500;600&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+/* Layout: una columna tipo app de celular; el temporizador ocupa toda la pantalla.
+   Colores del logo: azul petróleo (barra y atleta), celeste (río), verde (costanera). */
+:root{
+  --bg:#F4F7F5; --surface:#FFFFFF; --ink:#0E3A44; --muted:#557079; --line:#D6E1E1;
+  --accent:#0E3A44; --accent-ink:#FFFFFF; --chalk:#58B3D3; --chalk-ink:#0A2C34; --done:#4E7C58;
+  --f-display:"Montserrat","Avenir Next",system-ui,sans-serif;
+  --f-body:"Barlow",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-num:"JetBrains Mono",ui-monospace,Consolas,monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){:root{
+  --bg:#0A1E23; --surface:#11292F; --ink:#E3EEF0; --muted:#8EA8AE; --line:#21404A;
+  --accent:#6CC3E0; --accent-ink:#0A1E23; --chalk:#58B3D3; --chalk-ink:#0A2C34; --done:#76AE7F; color-scheme:dark}}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.45;-webkit-tap-highlight-color:transparent}
+.wrap{max-width:620px;margin:0 auto;padding-inline:16px;padding-block:calc(14px + env(safe-area-inset-top,0px)) calc(60px + env(safe-area-inset-bottom,0px))}
+button{font-family:inherit;color:inherit}
+button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.brand{display:flex;align-items:center;gap:12px;min-width:0}
+.emblem{mix-blend-mode:multiply;flex:none;width:68px;height:62px;background:url(logo.webp) no-repeat;background-size:111px 111px;background-position:-21px -12px}
+@media (prefers-color-scheme: dark){.emblem{mix-blend-mode:normal;border-radius:50%;background-color:#F4F7F5;width:66px;height:66px;background-position:-22px -10px}}
+h1{margin:0;font-family:var(--f-display);font-weight:700;font-size:22px;letter-spacing:.08em;text-transform:uppercase;line-height:1.1}
+h1 small{display:block;font-weight:600;font-size:13px;letter-spacing:.24em;color:var(--chalk);margin-top:3px}
+h1 small i{font-style:normal;color:var(--done);letter-spacing:.18em;font-size:10px;display:block;margin-top:3px}
+h2{font-family:var(--f-display);font-weight:700;font-size:22px;letter-spacing:.03em;text-transform:uppercase;margin:0;line-height:1.15;text-wrap:balance}
+.label{font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.muted{color:var(--muted)}
+.badge{display:inline-block;font-size:11px;letter-spacing:.06em;text-transform:uppercase;font-weight:600;padding:3px 8px;border-radius:999px;border:1px solid var(--chalk);color:var(--chalk)}
+.top{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap;padding-bottom:16px;border-bottom:1px solid var(--line)}
+.week{margin-top:20px;display:flex;flex-direction:column;gap:4px}
+.list{display:flex;flex-direction:column;gap:12px;margin-top:16px}
+.scard{display:flex;flex-direction:column;gap:8px;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;cursor:pointer;width:100%}
+.scard .t{font-family:var(--f-display);font-weight:700;font-size:17px;letter-spacing:.02em;text-transform:uppercase;line-height:1.1}
+.scard.done{border-color:var(--done)}
+.bar{height:6px;border-radius:3px;background:var(--line);overflow:hidden}
+.bar i{display:block;height:100%;background:var(--accent);border-radius:3px}
+.scard.done .bar i{background:var(--done)}
+.row{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.status{font-size:13px;font-weight:600}
+.status.ok{color:var(--done)}
+.stats{margin-top:26px;display:flex;gap:24px;flex-wrap:wrap}
+.stat b{display:block;font-family:var(--f-num);font-size:26px;font-variant-numeric:tabular-nums}
+
+/* sesión */
+.back{background:none;border:0;padding:6px 0;font-weight:600;color:var(--muted);cursor:pointer;font-size:15px}
+.shead{display:flex;flex-direction:column;gap:6px;padding-bottom:14px;border-bottom:1px solid var(--line)}
+.block{margin-top:26px}
+.bhead{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:10px}
+.bhead h3{font-family:var(--f-display);font-weight:700;font-size:16px;text-transform:uppercase;margin:0;letter-spacing:.04em}
+.block.calma .bhead h3{color:var(--done)}
+.ex{padding:14px 0;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:10px}
+.ex:last-child{border-bottom:1px solid var(--line)}
+.exh{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.exh .n{font-weight:600;font-size:17px;line-height:1.25}
+.ex.complete .n{color:var(--muted);text-decoration:line-through;text-decoration-thickness:1px}
+.dose{font-family:var(--f-num);font-size:13px;color:var(--muted);white-space:nowrap;padding-top:2px}
+.sets{display:flex;gap:8px;flex-wrap:wrap}
+.set{min-width:52px;height:46px;padding:0 12px;border-radius:10px;border:1.5px solid var(--line);background:var(--surface);font:600 15px var(--f-num);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px}
+.set.timed::before{content:"";width:0;height:0;border-left:8px solid currentColor;border-top:5px solid transparent;border-bottom:5px solid transparent;opacity:.6}
+.set.on{background:var(--done);border-color:var(--done);color:#fff}
+.set.on::before{display:none}
+.go{height:46px;padding:0 18px;border-radius:10px;border:0;background:var(--accent);color:var(--accent-ink);font:600 15px var(--f-body);cursor:pointer}
+.go.on{background:var(--done);color:#fff}
+.ilist{margin:0;padding-left:18px;font-size:15px}
+.more{font-size:14px}
+.more summary{cursor:pointer;color:var(--accent);font-weight:600;list-style:none}
+.more summary::-webkit-details-marker{display:none}
+.more summary::before{content:"+ "}
+.more[open] summary::before{content:"− "}
+.more ul{margin:6px 0 0;padding-left:18px}
+.more p{margin:6px 0 0}
+.play{width:100%;margin-bottom:10px;display:flex;align-items:baseline;justify-content:center;gap:10px;flex-wrap:wrap;height:auto;min-height:50px;padding:10px 16px;border-radius:10px;border:1.5px dashed var(--accent);background:none;color:var(--accent);font:700 16px var(--f-body);cursor:pointer}
+.play small{font-weight:500;font-size:13px;opacity:.8}
+.voz{height:32px;padding:0 12px;border-radius:999px;border:1.5px solid var(--accent);background:none;color:var(--accent);font:600 13px var(--f-body);cursor:pointer;text-transform:capitalize}
+.voz.off{border-color:var(--line);color:var(--muted)}
+.timer .tools{display:flex;gap:8px;align-items:center}
+.timer .rep{height:40px;padding:0 14px;border-radius:999px;border:2px solid currentColor;background:none;color:inherit;font-weight:600;cursor:pointer}
+.timer .clock.up{opacity:.55;font-size:clamp(60px,20vw,120px)}
+.rounds{font-family:var(--f-num);font-size:13px;color:var(--done);font-weight:700}
+.banner{margin-top:22px;padding:16px;border-radius:12px;background:var(--done);color:#fff;display:flex;flex-direction:column;gap:4px}
+.banner b{font-family:var(--f-display);font-size:19px;text-transform:uppercase;font-weight:700;letter-spacing:.03em}
+.reset{margin-top:30px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.link{background:none;border:0;padding:0;color:var(--muted);text-decoration:underline;cursor:pointer;font-size:14px}
+.btn{height:40px;padding:0 16px;border-radius:999px;border:1.5px solid var(--line);background:none;font-weight:600;cursor:pointer}
+.btn.warn{border-color:#B3402F;color:#B3402F}
+
+/* temporizador */
+.timer{position:fixed;inset:0;z-index:20;display:flex;flex-direction:column;padding:calc(18px + env(safe-area-inset-top,0px)) 20px calc(24px + env(safe-area-inset-bottom,0px));background:var(--accent);color:var(--accent-ink);transition:background .25s}
+.timer.rest{background:var(--chalk);color:var(--chalk-ink)}
+.timer.prep{background:var(--ink);color:var(--bg)}
+.timer .tt{display:flex;justify-content:space-between;align-items:center;gap:10px;font-weight:600}
+.timer .x{background:none;border:2px solid currentColor;border-radius:999px;width:40px;height:40px;font-size:20px;line-height:1;cursor:pointer;color:inherit}
+.timer .mid{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:10px;min-height:0}
+.timer .ph{font-family:var(--f-display);font-weight:700;font-size:clamp(22px,6.5vw,38px);letter-spacing:.02em;text-transform:uppercase;line-height:1.05;text-wrap:balance}
+.timer .clock{font-family:var(--f-num);font-weight:700;font-size:clamp(84px,30vw,180px);line-height:1;font-variant-numeric:tabular-nums}
+.timer .info{font-size:18px;font-weight:600;opacity:.9}
+.timer .next{font-size:15px;opacity:.8}
+.timer .ctl{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.timer .ctl button{height:56px;min-width:120px;padding:0 20px;border-radius:999px;border:2px solid currentColor;background:none;color:inherit;font-weight:700;font-size:17px;cursor:pointer}
+.timer .ctl button.main{background:currentColor}
+.timer .ctl button.main span{color:var(--accent)}
+.timer.rest .ctl button.main span{color:var(--chalk)}
+.timer.prep .ctl button.main span{color:var(--ink)}
+.amrap{display:flex;align-items:center;gap:16px}
+.amrap button{width:56px;height:56px;border-radius:50%;border:2px solid currentColor;background:none;color:inherit;font-size:26px;font-weight:700;cursor:pointer}
+.amrap b{font-family:var(--f-num);font-size:44px;min-width:70px}
+.circ{font-size:16px;opacity:.9;margin:0;padding:0;list-style:none}
+
+/* modal */
+.modal{position:fixed;inset:0;z-index:30;background:color-mix(in srgb,var(--ink) 55%,transparent);display:flex;align-items:flex-end;justify-content:center;padding:16px}
+.sheet{background:var(--surface);color:var(--ink);border-radius:16px;padding:24px 20px calc(20px + env(safe-area-inset-bottom,0px));max-width:520px;width:100%;display:flex;flex-direction:column;gap:12px}
+.sheet h2{color:var(--done)}
+.sheet .go{width:100%}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap" id="app"></div>
+<div class="timer" id="timer" hidden></div>
+<div class="modal" id="modal" hidden></div>
+
+<script src="rutina.js"></script>
+<script>
+const R = window.RUTINA;
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? "").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const mmss = s => { s=Math.max(0,Math.round(s)); return `${Math.floor(s/60)}:${String(s%60).padStart(2,"0")}`; };
+const secTxt = s => s>=60 ? mmss(s) : `${s}"`;
+const fecha = ts => { const d=new Date(ts); return `${d.getDate()}/${d.getMonth()+1}`; };
+
+/* ---------- guardado en el celular ---------- */
+const store = {
+  get(k,def){ try{ const v=localStorage.getItem(k); return v?JSON.parse(v):def; }catch{ return def; } },
+  set(k,v){ try{ localStorage.setItem(k,JSON.stringify(v)); }catch{} }
+};
+const key = sid => `bl:${R.id}:${sid}`;
+const loadS = sid => store.get(key(sid), {done:{},rounds:{},startedAt:null,mainAt:null,endAt:null});
+const saveS = (sid,st) => store.set(key(sid),st);
+
+/* ---------- modelo ---------- */
+const isInterval = it => ["tabata","emom","amrap"].includes(it.tipo);
+const nSets = it => isInterval(it) ? 1 : (it.series||1);
+function itemDone(st,bi,ii,it){ for(let s=0;s<nSets(it);s++) if(!st.done[`${bi}-${ii}-${s}`]) return false; return true; }
+function blockDone(st,ses,pred){ return ses.bloques.every((b,bi)=>!pred(b) || b.items.every((it,ii)=>itemDone(st,bi,ii,it))); }
+function progress(ses,st){ let t=0,d=0; ses.bloques.forEach((b,bi)=>b.items.forEach((it,ii)=>{ for(let s=0;s<nSets(it);s++){ t++; if(st.done[`${bi}-${ii}-${s}`]) d++; } })); return {t,d}; }
+function dose(it){
+  switch(it.tipo){
+    case "reps": return `${it.series} × ${it.reps}${it.descanso?` · desc ${secTxt(it.descanso)}`:""}`;
+    case "tiempo": return `${it.series} × ${secTxt(it.seg)}${it.descanso&&it.series>1?` · desc ${secTxt(it.descanso)}`:""}`;
+    case "tabata": return `${it.rondas} × ${it.trabajo}"/${it.pausa}" · ${mmss(it.rondas*(it.trabajo+it.pausa))}`;
+    case "emom": return `${it.minutos}' · cada minuto`;
+    case "amrap": return `${it.minutos}' · máx. rondas`;
+  }
+  return "";
+}
+
+/* ---------- vistas ---------- */
+const openMore = new Set();
+let confirmReset = false;
+function render(){
+  const sid = location.hash.slice(1);
+  const ses = R.sesiones.find(s=>s.id===sid);
+  ses ? renderSession(ses) : renderHome();
+}
+const vozBtn = () => window.speechSynthesis ? `<button class="voz ${voz==="apagada"?"off":""}" data-voz aria-label="Cambiar narración">Voz: ${voz}</button>` : "";
+function renderHome(){
+  const hist = store.get("bl:hist",[]);
+  const doneThisWeek = R.sesiones.filter(s=>loadS(s.id).endAt).length;
+  $("app").innerHTML = `
+    <div class="top"><div class="brand"><div class="emblem" role="img" aria-label="Logo"></div><h1>Calistenia<small>en la Rivera<i>Mercedes</i></small></h1></div>${R.ejemplo?'<span class="badge">Rutina de ejemplo</span>':""}</div>
+    <div class="week"><div class="row"><span class="label">Rutina de la semana</span>${vozBtn()}</div><h2>${esc(R.semana)}</h2></div>
+    <div class="list">${R.sesiones.map(s=>{ const st=loadS(s.id), p=progress(s,st);
+      return `<button class="scard ${st.endAt?"done":""}" data-open="${esc(s.id)}">
+        <span class="t">${esc(s.nombre)}</span><span class="muted">${esc(s.sub||"")}</span>
+        <span class="bar"><i style="width:${p.t?Math.round(100*p.d/p.t):0}%"></i></span>
+        <span class="row"><span class="status ${st.endAt?"ok":""}">${st.endAt?`✓ Completada el ${fecha(st.endAt)}`:p.d?`En curso · ${p.d}/${p.t} series`:"Sin empezar"}</span><span class="label">Abrir →</span></span>
+      </button>`; }).join("")}</div>
+    <div class="stats">
+      <div class="stat"><span class="label">Esta semana</span><b>${doneThisWeek}/${R.sesiones.length}</b></div>
+      <div class="stat"><span class="label">Sesiones en total</span><b>${hist.length}</b></div>
+    </div>`;
+  window.scrollTo(0,0);
+}
+function exHTML(st,bi,ii,it){
+  const k=`${bi}-${ii}`, complete=itemDone(st,bi,ii,it);
+  let ctl="";
+  if(isInterval(it)){
+    const on=st.done[`${k}-0`], word={tabata:"tabata",emom:"EMOM",amrap:"AMRAP"}[it.tipo];
+    ctl = `<ul class="ilist">${it.ejercicios.map(e=>`<li>${esc(e)}</li>`).join("")}</ul>
+      <div class="sets"><button class="go ${on?"on":""}" data-int="${k}">${on?"✓ Hecho · repetir":`▶ Iniciar ${word}`}</button>
+      ${on?"":`<button class="set" data-set="${k}-0" aria-label="Marcar como hecho">✓</button>`}</div>
+      ${it.tipo==="amrap"&&st.rounds[k]!=null?`<span class="rounds">${st.rounds[k]} rondas completas</span>`:""}`;
+  } else {
+    const timed = it.tipo==="tiempo";
+    ctl = `<div class="sets">${Array.from({length:it.series},(_,s)=>{ const on=st.done[`${k}-${s}`];
+      return `<button class="set ${on?"on":""} ${timed?"timed":""}" data-set="${k}-${s}" aria-pressed="${!!on}" aria-label="Serie ${s+1}">${on?"✓":s+1}</button>`; }).join("")}</div>`;
+  }
+  const extra = (it.claves?.length||it.facil||it.dificil) ? `<details class="more" data-more="${k}" ${openMore.has(k)?"open":""}><summary>Cómo se hace</summary>
+      ${it.claves?.length?`<ul>${it.claves.map(c=>`<li>${esc(c)}</li>`).join("")}</ul>`:""}
+      ${it.facil?`<p><b>Más fácil:</b> ${esc(it.facil)}</p>`:""}${it.dificil?`<p><b>Más difícil:</b> ${esc(it.dificil)}</p>`:""}</details>` : "";
+  return `<div class="ex ${complete?"complete":""}"><div class="exh"><span class="n">${esc(it.nombre)}</span><span class="dose">${esc(dose(it))}</span></div>${ctl}${extra}</div>`;
+}
+function renderSession(ses){
+  const st=loadS(ses.id), p=progress(ses,st);
+  const mainDone = blockDone(st,ses,b=>b.tipo!=="calma");
+  $("app").innerHTML = `
+    <button class="back" data-home>← Semana</button>
+    <div class="shead"><div class="row"><span class="label">${esc(R.semana)}</span>${vozBtn()}</div><h2>${esc(ses.nombre)}</h2><span class="muted">${esc(ses.sub||"")}</span>
+      <span class="bar"><i style="width:${p.t?Math.round(100*p.d/p.t):0}%"></i></span></div>
+    ${ses.bloques.map((b,bi)=>`
+      ${b.tipo==="calma"&&mainDone?`<div class="banner"><b>Entrenamiento concluido</b><span>${st.endAt?"Sesión terminada. Buen trabajo.":"Ahora, la vuelta a la calma."}</span></div>`:""}
+      <section class="block ${b.tipo}" id="b${bi}"><div class="bhead"><h3>${esc(b.nombre)}</h3><span class="label">${{entrada:"Entrada en calor",principal:"Principal",calma:"Calma"}[b.tipo]||""}</span></div>
+      ${b.items.every((it,ii)=>itemDone(st,bi,ii,it))?"":`<button class="play" data-block="${bi}">▶ Reproducir bloque<small>${voz==="apagada"?"corre solo":"corre solo, con voz"}</small></button>`}
+      ${b.items.map((it,ii)=>exHTML(st,bi,ii,it)).join("")}</section>`).join("")}
+    <div class="reset">${confirmReset
+      ?`<span class="muted">¿Borrar lo marcado en esta sesión?</span><button class="btn warn" data-reset-yes>Sí, reiniciar</button><button class="btn" data-reset-no>Cancelar</button>`
+      :`<button class="link" data-reset>Reiniciar sesión</button>`}</div>`;
+}
+
+/* ---------- acciones ---------- */
+function currentSes(){ return R.sesiones.find(s=>s.id===location.hash.slice(1)); }
+function mark(ses,k,val){
+  const st=loadS(ses.id), wasMain=blockDone(st,ses,b=>b.tipo!=="calma"), wasAll=!!st.endAt;
+  if(val) st.done[k]=true; else delete st.done[k];
+  if(!st.startedAt && val) st.startedAt=Date.now();
+  const nowMain=blockDone(st,ses,b=>b.tipo!=="calma"), nowAll=blockDone(st,ses,()=>true);
+  if(nowMain && !st.mainAt) st.mainAt=Date.now();
+  if(nowAll && !st.endAt){ st.endAt=Date.now(); const h=store.get("bl:hist",[]); h.push({semana:R.id,sesion:ses.id,inicio:st.startedAt,fin:st.endAt}); store.set("bl:hist",h); }
+  if(!nowAll) st.endAt=null;
+  saveS(ses.id,st); render();
+  if(nowAll && !wasAll) celebrate(ses,st,true);
+  else if(nowMain && !wasMain) celebrate(ses,st,false);
+}
+function celebrate(ses,st,all){
+  const mins = st.startedAt ? Math.round(((all?st.endAt:st.mainAt)-st.startedAt)/60000) : null;
+  const p=progress(ses,st);
+  const calmaIdx = ses.bloques.findIndex(b=>b.tipo==="calma");
+  $("modal").innerHTML = `<div class="sheet" role="dialog" aria-modal="true">
+    <span class="label">${esc(ses.nombre)}</span>
+    <h2>${all?"Sesión terminada":"Entrenamiento concluido"}</h2>
+    <span>${mins!=null?`${mins} min · `:""}${p.d} series hechas</span>
+    <span class="muted">${all?"Hidratate y descansá. Nos vemos el sábado en la rivera.":"Bajá pulsaciones y estirá: la vuelta a la calma te espera."}</span>
+    <button class="go" data-modal-go="${all||calmaIdx<0?"":calmaIdx}">${all?"Volver a la semana":"Ir a la vuelta a la calma"}</button></div>`;
+  $("modal").hidden=false; tone([523,659,784],.16);
+}
+document.addEventListener("click",e=>{
+  const t=e.target;
+  const open=t.closest("[data-open]"); if(open){ location.hash=open.dataset.open; return; }
+  if(t.closest("[data-home]")){ location.hash=""; return; }
+  const mg=t.closest("[data-modal-go]");
+  if(mg){ $("modal").hidden=true; const i=mg.dataset.modalGo; if(i==="") location.hash=""; else $("b"+i)?.scrollIntoView({behavior:"smooth"}); return; }
+  if(t===$("modal")){ $("modal").hidden=true; return; }
+  const ses=currentSes(); if(!ses) return;
+  if(t.closest("[data-reset]")){ confirmReset=true; render(); return; }
+  if(t.closest("[data-reset-no]")){ confirmReset=false; render(); return; }
+  if(t.closest("[data-reset-yes]")){ confirmReset=false; store.set(key(ses.id),{done:{},rounds:{}}); render(); return; }
+  const sb=t.closest("[data-set]");
+  if(sb){ const k=sb.dataset.set, [bi,ii,s]=k.split("-").map(Number), it=ses.bloques[bi].items[ii], st=loadS(ses.id);
+    if(st.done[k]){ mark(ses,k,false); return; }
+    if(it.tipo==="tiempo") return runItem(ses,bi,ii,s);
+    mark(ses,k,true);
+    const next=pendingSets(loadS(ses.id),bi,ii,it)[0];
+    if(it.tipo==="reps" && it.descanso && next!=null) runRest(ses,bi,ii,next);
+    return; }
+  const ib=t.closest("[data-int]");
+  if(ib){ const [bi,ii]=ib.dataset.int.split("-").map(Number); runItem(ses,bi,ii,0); return; }
+  const bb=t.closest("[data-block]");
+  if(bb){ runBlock(ses,Number(bb.dataset.block)); }
+});
+document.addEventListener("click",e=>{
+  if(!e.target.closest("[data-voz]")) return;
+  voz=VOCES[(VOCES.indexOf(voz)+1)%VOCES.length]; store.set("bl:voz",voz); render();
+  speak(voz==="detallada"?"Narración detallada: nombre, dosis y claves técnicas.":voz==="breve"?"Narración breve.":"");
+});
+document.addEventListener("toggle",e=>{ const d=e.target; if(d.dataset?.more){ d.open?openMore.add(d.dataset.more):openMore.delete(d.dataset.more); } },true);
+window.addEventListener("hashchange",()=>{ confirmReset=false; render(); window.scrollTo(0,0); keepAwake(); });
+
+/* ---------- voz ---------- */
+const VOCES=["detallada","breve","apagada"];
+let voz=store.get("bl:voz","detallada"), voice=null;
+function pickVoice(){ try{ const vs=speechSynthesis.getVoices();
+  voice = vs.find(v=>/^es[-_]AR/i.test(v.lang)) || vs.find(v=>/^es[-_](419|US|MX|UY)/i.test(v.lang)) || vs.find(v=>/^es/i.test(v.lang)) || null; }catch{} }
+if(window.speechSynthesis){ pickVoice(); speechSynthesis.addEventListener?.("voiceschanged",pickVoice); }
+function speak(text,queue){
+  if(voz==="apagada" || !text || !window.speechSynthesis) return;
+  try{ if(!queue) speechSynthesis.cancel();
+    const u=new SpeechSynthesisUtterance(text); u.lang=voice?.lang||"es-AR"; if(voice) u.voice=voice; u.rate=1.05;
+    speechSynthesis.speak(u); }catch{}
+}
+const hablarSeg = s => { const m=Math.floor(s/60), r=s%60, mt=m===1?"un minuto":`${m} minutos`;
+  return s<60 ? `${s} segundos` : r ? `${mt} y ${r} segundos` : mt; };
+const hablarReps = r => String(r).replace(/\s*[–-]\s*/g," a ").replace(/c\//g,"por ").replace(/\s*·\s*/g,", ").replace(/(\d+)\s*s\b/g,"$1 segundos");
+const clavesTxt = it => it.claves?.length ? " " + it.claves.join(". ") + "." : "";
+function intro(it,s){
+  if(it.tipo==="tabata") return `${it.nombre}: ${it.rondas} rondas de ${it.trabajo} segundos de trabajo y ${it.pausa} de pausa. ${it.ejercicios.join(" y ")}.`;
+  if(it.tipo==="emom") return `${it.nombre}: ${it.minutos} minutos. ${it.ejercicios.join(", después ")}.`;
+  if(it.tipo==="amrap") return `${it.nombre}: máximas rondas en ${it.minutos} minutos de ${it.ejercicios.join(", ")}.`;
+  const serie = it.series>1 ? `, serie ${s+1} de ${it.series}` : "";
+  return `${it.nombre}${serie}: ${it.tipo==="tiempo"?hablarSeg(it.seg):hablarReps(it.reps)}.`;
+}
+
+/* ---------- sonido, vibración y pantalla encendida ---------- */
+let ac=null;
+function audio(){ try{ ac = ac || new (window.AudioContext||window.webkitAudioContext)(); if(ac.state==="suspended") ac.resume(); }catch{} }
+function tone(freqs,dur){ if(!ac) return; freqs.forEach((f,i)=>{ const o=ac.createOscillator(), g=ac.createGain(), t0=ac.currentTime+i*dur;
+  o.frequency.value=f; o.type="square"; g.gain.setValueAtTime(.0001,t0); g.gain.exponentialRampToValueAtTime(.25,t0+.01); g.gain.exponentialRampToValueAtTime(.0001,t0+dur*.95);
+  o.connect(g).connect(ac.destination); o.start(t0); o.stop(t0+dur); }); }
+const buzz = p => { try{ navigator.vibrate?.(p); }catch{} };
+let lock=null;
+async function keepAwake(){ try{ if(currentSes() && !lock && navigator.wakeLock){ lock=await navigator.wakeLock.request("screen"); lock.addEventListener("release",()=>lock=null); } }catch{} }
+document.addEventListener("visibilitychange",()=>{ if(document.visibilityState==="visible") keepAwake(); });
+
+/* ---------- temporizador ---------- */
+/* Una fase: {label, secs (null = sin tiempo, se cierra con "Listo"), kind work|rest|prep, info, say, sayLong, key, amrap, circuit} */
+const T={phases:[],i:0,startAt:0,endAt:0,pausedLeft:null,iv:null,ses:null,rounds:0,title:"",lastBeep:null,endSay:null};
+function runTimer({title,phases,ses,endSay}){
+  audio(); keepAwake();
+  Object.assign(T,{title,phases,ses:ses||null,endSay:endSay||null,i:0,pausedLeft:null});
+  $("timer").hidden=false; startPhase(Date.now()); drawTimer();
+  clearInterval(T.iv); T.iv=setInterval(tick,200);
+}
+function startPhase(base){
+  const p=T.phases[T.i];
+  T.startAt=base; T.endAt = p.secs==null ? Infinity : base+p.secs*1000;
+  T.lastBeep=null; T.said10=false; T.saidHalf=false; if(p.amrap) T.rounds=0;
+  if(p.kind==="work"){ tone([880],.35); buzz(300); } else { tone([440],.35); buzz([120,80,120]); }
+  sayPhase();
+}
+function sayPhase(){ const p=T.phases[T.i]; speak(voz==="detallada" && p.sayLong ? p.sayLong : p.say); }
+function closePhase(p){
+  if(!T.ses || !p.key) return;
+  if(p.amrap){ const st=loadS(T.ses.id); st.rounds[p.key.slice(0,-2)]=T.rounds; saveS(T.ses.id,st); }
+  mark(T.ses,p.key,true);
+}
+function advance(base){
+  closePhase(T.phases[T.i]); T.i++;
+  if(T.i>=T.phases.length){ endTimer(true); return false; }
+  startPhase(base); return true;
+}
+function tick(){
+  if(T.pausedLeft!=null || $("timer").hidden) return;
+  while(Date.now()>=T.endAt){ if(!advance(T.endAt)) return; }
+  const p=T.phases[T.i], left=Math.ceil((T.endAt-Date.now())/1000);
+  if(p.secs!=null){
+    if(left<=3 && left>=1 && T.lastBeep!==left && p.secs>4){ T.lastBeep=left; tone([660],.12); }
+    if(p.kind==="work" && p.secs>=40 && !T.saidHalf && left<=p.secs/2 && left>10){ T.saidHalf=true; speak("Mitad.",true); }
+    if(p.secs>=25 && !T.said10 && left<=10 && left>3){ T.said10=true; speak("Diez segundos.",true); }
+  }
+  drawTimer();
+}
+function drawTimer(){
+  const p=T.phases[T.i], nx=T.phases[T.i+1], manual=p.secs==null;
+  const shown = manual ? (Date.now()-T.startAt)/1000 : (T.pausedLeft!=null ? T.pausedLeft/1000 : (T.endAt-Date.now())/1000);
+  const el=$("timer"); el.className="timer "+(p.kind==="work"?"":p.kind);
+  el.innerHTML = `<div class="tt"><span>${esc(T.title)}</span><span class="tools">${voz!=="apagada"&&p.say?`<button class="rep" data-t="say">Repetir voz</button>`:""}<button class="x" data-t="close" aria-label="Cerrar temporizador">×</button></span></div>
+    <div class="mid">
+      <div class="ph">${esc(p.label)}</div>
+      <div class="clock ${manual?"up":""}">${mmss(manual?Math.floor(shown):Math.ceil(shown))}</div>
+      ${p.info?`<div class="info">${esc(p.info)}</div>`:""}
+      ${p.amrap?`<ul class="circ">${p.circuit.map(c=>`<li>${esc(c)}</li>`).join("")}</ul>
+        <div class="amrap"><button data-t="minus" aria-label="Restar ronda">−</button><b>${T.rounds}</b><button data-t="plus" aria-label="Sumar ronda">+</button></div><div class="next">Rondas completas</div>`:""}
+      ${nx?`<div class="next">Después: ${esc(nx.label)}${nx.secs!=null?` · ${secTxt(nx.secs)}`:""}</div>`:""}
+    </div>
+    <div class="ctl">${manual
+      ? `<button class="main" data-t="skip"><span>Listo</span></button>`
+      : `<button class="main" data-t="pause"><span>${T.pausedLeft!=null?"Seguir":"Pausa"}</span></button>
+         <button data-t="skip">${T.i===T.phases.length-1?(p.kind==="rest"?"Listo":"Terminé"):"Saltar"}</button>`}</div>`;
+}
+function endTimer(completed){
+  clearInterval(T.iv); $("timer").hidden=true;
+  if(completed){ tone([784,784,1046],.18); buzz([200,100,200,100,400]); speak(T.endSay || (T.phases.length>2?"Bloque terminado. Buen trabajo.":"")); }
+  else { try{ speechSynthesis.cancel(); }catch{} }
+}
+$("timer").addEventListener("click",e=>{
+  const a=e.target.closest("[data-t]")?.dataset.t; if(!a) return;
+  if(a==="close") endTimer(false);
+  if(a==="say") sayPhase();
+  if(a==="pause"){ if(T.pausedLeft!=null){ T.endAt=Date.now()+T.pausedLeft; T.pausedLeft=null; speak("Seguimos."); } else { T.pausedLeft=Math.max(0,T.endAt-Date.now()); speak("Pausa."); } drawTimer(); }
+  if(a==="skip"){ const wasPaused=T.pausedLeft!=null; T.pausedLeft=null; if(advance(Date.now())){ if(wasPaused) T.pausedLeft=(T.endAt-Date.now()); drawTimer(); } }
+  if(a==="plus"){ T.rounds++; tone([988],.08); drawTimer(); }
+  if(a==="minus"){ T.rounds=Math.max(0,T.rounds-1); drawTimer(); }
+});
+
+/* ---------- armado de las secuencias ---------- */
+function leadPhase(it,s,{first,blockName,secs}){
+  const nx=intro(it,s), detail=(s===0||first)?clavesTxt(it):"";
+  if(first) return {label:"Preparate",secs,kind:"prep",info:`Primero: ${it.nombre}`,
+    say:`${blockName?`Arrancamos con ${blockName}. `:""}Primero: ${nx}`, sayLong:`${blockName?`Arrancamos con ${blockName}. `:""}Primero: ${nx}${detail}`};
+  const word = s>0 ? "Descanso" : "Cambio";
+  return {label:s>0?"Descanso":"Cambio de ejercicio",secs,kind:"rest",info:`Sigue: ${it.nombre}${!isInterval(it)&&it.series>1?` · serie ${s+1} de ${it.series}`:""}`,
+    say:`${word}. Lo que sigue: ${nx}`, sayLong:`${word}. Lo que sigue: ${nx}${detail}`};
+}
+function workPhases(bi,ii,it,s){
+  const key=`${bi}-${ii}-${s}`;
+  if(it.tipo==="tiempo") return [{label:it.nombre,secs:it.seg,kind:"work",info:it.series>1?`Serie ${s+1} de ${it.series}`:"",say:"¡Vamos!",key}];
+  if(it.tipo==="reps") return [{label:it.nombre,secs:it.seg||null,kind:"work",info:`${it.reps}${it.series>1?` · serie ${s+1} de ${it.series}`:""}`,
+    say: it.seg ? "¡Vamos!" : "¡Vamos! Tocá Listo cuando termines.", key}];
+  const ex=it.ejercicios, ph=[], k0=`${bi}-${ii}-0`;
+  if(it.tipo==="tabata") for(let r=0;r<it.rondas;r++){
+    ph.push({label:ex[r%ex.length],secs:it.trabajo,kind:"work",info:`Ronda ${r+1} de ${it.rondas}`,say:`¡${ex[r%ex.length]}!`});
+    if(r<it.rondas-1) ph.push({label:"Pausa",secs:it.pausa,kind:"rest",info:`Viene: ${ex[(r+1)%ex.length]}`,say:`Pausa. Viene ${ex[(r+1)%ex.length]}.`}); }
+  if(it.tipo==="emom") for(let m=0;m<it.minutos;m++) ph.push({label:ex[m%ex.length],secs:60,kind:"work",info:`Minuto ${m+1} de ${it.minutos}`,
+    say: m===it.minutos-1 ? `Último minuto. ${ex[m%ex.length]}.` : `Minuto ${m+1}. ${ex[m%ex.length]}.`});
+  if(it.tipo==="amrap") ph.push({label:"AMRAP",secs:it.minutos*60,kind:"work",info:"Máximas rondas con buena técnica",say:"¡Vamos! Sumá cada ronda completa.",amrap:true,circuit:ex});
+  ph[ph.length-1].key=k0;
+  return ph;
+}
+/* parts: [{bi,ii,sets:[s,...]}] */
+function playlist(ses,parts,{blockName,prep}){
+  const ph=[];
+  parts.forEach(({bi,ii,sets})=>{ const b=ses.bloques[bi], it=b.items[ii];
+    sets.forEach((s,j)=>{
+      if(!ph.length) ph.push(leadPhase(it,s,{first:true,blockName,secs:prep}));
+      else ph.push(leadPhase(it,s,{secs: j>0 ? (it.descanso||10) : (it.transicion ?? b.transicion ?? 15)}));
+      ph.push(...workPhases(bi,ii,it,s));
+    }); });
+  return ph;
+}
+const pendingSets = (st,bi,ii,it,from=0) => [...Array(nSets(it)).keys()].filter(s=>s>=from && !st.done[`${bi}-${ii}-${s}`]);
+function runBlock(ses,bi){
+  const st=loadS(ses.id), b=ses.bloques[bi];
+  const parts=b.items.map((it,ii)=>({bi,ii,sets:pendingSets(st,bi,ii,it)})).filter(p=>p.sets.length);
+  if(!parts.length) return;
+  runTimer({title:b.nombre, ses, phases:playlist(ses,parts,{blockName:b.nombre.toLowerCase(),prep:10}),
+    endSay: b.tipo==="calma" ? "Vuelta a la calma terminada. Buen trabajo." : `${b.nombre} terminado.`});
+}
+function runItem(ses,bi,ii,from){
+  const st=loadS(ses.id), it=ses.bloques[bi].items[ii];
+  const sets = isInterval(it) ? [0] : pendingSets(st,bi,ii,it,from);
+  runTimer({title:it.nombre, ses, phases:playlist(ses,[{bi,ii,sets}],{prep:isInterval(it)?10:5}), endSay:`${it.nombre} terminado.`});
+}
+function runRest(ses,bi,ii,nextSet){
+  const it=ses.bloques[bi].items[ii];
+  runTimer({title:"Descanso", phases:[leadPhase(it,nextSet,{secs:it.descanso})], endSay:`¡Vamos! Serie ${nextSet+1}.`});
+}
+
+render(); keepAwake();
+if("serviceWorker" in navigator && (location.protocol==="https:" || location.hostname==="localhost")) navigator.serviceWorker.register("sw.js").catch(()=>{});
+</script>
+</body>
+</html>

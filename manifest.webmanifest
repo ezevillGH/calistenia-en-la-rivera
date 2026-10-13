@@ -1,0 +1,14 @@
+{
+  "name": "Calistenia en la Rivera",
+  "short_name": "Calistenia",
+  "description": "Rutina de la semana del grupo Calistenia en la Rivera, Mercedes.",
+  "lang": "es",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#F4F7F5",
+  "theme_color": "#0E3A44",
+  "icons": [
+    { "src": "logo.webp", "sizes": "1254x1254", "type": "image/webp", "purpose": "any" }
+  ]
+}
