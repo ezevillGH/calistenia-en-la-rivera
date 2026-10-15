@@ -93,6 +93,9 @@ h2{font-family:var(--f-display);font-weight:700;font-size:22px;letter-spacing:.0
 .timer .tools{display:flex;gap:8px;align-items:center}
 .timer .rep{height:40px;padding:0 14px;border-radius:999px;border:2px solid currentColor;background:none;color:inherit;font-weight:600;cursor:pointer}
 .timer .clock.up{opacity:.55;font-size:clamp(60px,20vw,120px)}
+.nivel{align-self:flex-start;margin-top:6px;background:none;border:1.5px solid var(--line);border-radius:999px;padding:6px 14px;font:500 14px var(--f-body);color:var(--ink);cursor:pointer}
+.nivel b{font-weight:700}
+.vid{display:inline-block;font-weight:700;color:var(--accent);text-decoration:none;border:1.5px solid var(--accent);border-radius:999px;padding:4px 12px}
 .rounds{font-family:var(--f-num);font-size:13px;color:var(--done);font-weight:700}
 .banner{margin-top:22px;padding:16px;border-radius:12px;background:var(--done);color:#fff;display:flex;flex-direction:column;gap:4px}
 .banner b{font-family:var(--f-display);font-size:19px;text-transform:uppercase;font-weight:700;letter-spacing:.03em}
@@ -150,7 +153,15 @@ const store = {
   get(k,def){ try{ const v=localStorage.getItem(k); return v?JSON.parse(v):def; }catch{ return def; } },
   set(k,v){ try{ localStorage.setItem(k,JSON.stringify(v)); }catch{} }
 };
-const key = sid => `bl:${R.id}:${sid}`;
+/* ---------- nivel: cada uno ve solo su rutina ---------- */
+const NIVELES = R.niveles || [];
+let nivel = store.get("bl:nivel", null);
+const nivelOk = () => !NIVELES.length || NIVELES.some(n=>n.id===nivel);
+const nivelNombre = () => NIVELES.find(n=>n.id===nivel)?.nombre || "";
+const delNivel = x => !x.nivel || x.nivel===nivel;
+// Sesiones del nivel elegido, con solo sus bloques
+function SES(){ return R.sesiones.filter(delNivel).map(s=>({...s, bloques:s.bloques.filter(delNivel)})); }
+const key = sid => `bl:${R.id}:${nivel||"x"}:${sid}`;
 const loadS = sid => store.get(key(sid), {done:{},rounds:{},startedAt:null,mainAt:null,endAt:null});
 const saveS = (sid,st) => store.set(key(sid),st);
 
@@ -176,24 +187,39 @@ const openMore = new Set();
 let confirmReset = false;
 function render(){
   const sid = location.hash.slice(1);
-  const ses = R.sesiones.find(s=>s.id===sid);
+  if(sid==="nivel" || !nivelOk()) return renderNiveles();
+  const ses = SES().find(s=>s.id===sid);
   ses ? renderSession(ses) : renderHome();
+}
+function renderNiveles(){
+  $("app").innerHTML = `
+    <div class="top"><div class="brand"><div class="emblem" role="img" aria-label="Logo"></div><h1>Calistenia<small>en la Rivera<i>Mercedes</i></small></h1></div></div>
+    <div class="week"><span class="label">Antes de empezar</span><h2>Elegí tu nivel</h2>
+      <span class="muted">Ves solo tu rutina. Lo podés cambiar cuando quieras; si dudás, preguntale al profe el sábado.</span></div>
+    <div class="list">${NIVELES.map(n=>`<button class="scard ${n.id===nivel?"done":""}" data-nivel="${esc(n.id)}">
+      <span class="t">${esc(n.nombre)}</span><span class="muted">${esc(n.desc||"")}</span>
+      ${n.id===nivel?'<span class="status ok">✓ Tu nivel actual</span>':""}</button>`).join("")}</div>`;
+  window.scrollTo(0,0);
 }
 const vozBtn = () => window.speechSynthesis ? `<button class="voz ${voz==="apagada"?"off":""}" data-voz aria-label="Cambiar narración">Voz: ${voz}</button>` : "";
 function renderHome(){
   const hist = store.get("bl:hist",[]);
-  const doneThisWeek = R.sesiones.filter(s=>loadS(s.id).endAt).length;
+  const sesiones = SES();
+  const doneThisWeek = sesiones.filter(s=>loadS(s.id).endAt).length;
+  const cicloTxt = R.ciclo ? `Ciclo ${R.ciclo} · semana ${R.semanaCiclo} de 4${R.descarga?" · descarga":""}` : "Rutina de la semana";
   $("app").innerHTML = `
     <div class="top"><div class="brand"><div class="emblem" role="img" aria-label="Logo"></div><h1>Calistenia<small>en la Rivera<i>Mercedes</i></small></h1></div>${R.ejemplo?'<span class="badge">Rutina de ejemplo</span>':""}</div>
-    <div class="week"><div class="row"><span class="label">Rutina de la semana</span>${vozBtn()}</div><h2>${esc(R.semana)}</h2></div>
-    <div class="list">${R.sesiones.map(s=>{ const st=loadS(s.id), p=progress(s,st);
+    <div class="week"><div class="row"><span class="label">${esc(cicloTxt)}</span>${vozBtn()}</div><h2>${esc(R.semana)}</h2>
+      ${NIVELES.length?`<button class="nivel" data-goto-nivel>Nivel: <b>${esc(nivelNombre())}</b> · cambiar</button>`:""}
+      ${R.descarga?`<span class="muted">Semana liviana: menos volumen para que el cuerpo asimile. Es parte del plan.</span>`:""}</div>
+    <div class="list">${sesiones.map(s=>{ const st=loadS(s.id), p=progress(s,st);
       return `<button class="scard ${st.endAt?"done":""}" data-open="${esc(s.id)}">
         <span class="t">${esc(s.nombre)}</span><span class="muted">${esc(s.sub||"")}</span>
         <span class="bar"><i style="width:${p.t?Math.round(100*p.d/p.t):0}%"></i></span>
         <span class="row"><span class="status ${st.endAt?"ok":""}">${st.endAt?`✓ Completada el ${fecha(st.endAt)}`:p.d?`En curso · ${p.d}/${p.t} series`:"Sin empezar"}</span><span class="label">Abrir →</span></span>
       </button>`; }).join("")}</div>
     <div class="stats">
-      <div class="stat"><span class="label">Esta semana</span><b>${doneThisWeek}/${R.sesiones.length}</b></div>
+      <div class="stat"><span class="label">Esta semana</span><b>${doneThisWeek}/${sesiones.length}</b></div>
       <div class="stat"><span class="label">Sesiones en total</span><b>${hist.length}</b></div>
     </div>`;
   window.scrollTo(0,0);
@@ -212,9 +238,10 @@ function exHTML(st,bi,ii,it){
     ctl = `<div class="sets">${Array.from({length:it.series},(_,s)=>{ const on=st.done[`${k}-${s}`];
       return `<button class="set ${on?"on":""} ${timed?"timed":""}" data-set="${k}-${s}" aria-pressed="${!!on}" aria-label="Serie ${s+1}">${on?"✓":s+1}</button>`; }).join("")}</div>`;
   }
-  const extra = (it.claves?.length||it.facil||it.dificil) ? `<details class="more" data-more="${k}" ${openMore.has(k)?"open":""}><summary>Cómo se hace</summary>
+  const extra = (it.claves?.length||it.facil||it.dificil||it.video) ? `<details class="more" data-more="${k}" ${openMore.has(k)?"open":""}><summary>Cómo se hace</summary>
       ${it.claves?.length?`<ul>${it.claves.map(c=>`<li>${esc(c)}</li>`).join("")}</ul>`:""}
-      ${it.facil?`<p><b>Más fácil:</b> ${esc(it.facil)}</p>`:""}${it.dificil?`<p><b>Más difícil:</b> ${esc(it.dificil)}</p>`:""}</details>` : "";
+      ${it.facil?`<p><b>Más fácil:</b> ${esc(it.facil)}</p>`:""}${it.dificil?`<p><b>Más difícil:</b> ${esc(it.dificil)}</p>`:""}
+      ${/^https:\/\/youtu\.be\//.test(it.video||"")?`<p><a class="vid" href="${esc(it.video)}" target="_blank" rel="noopener">▶ Ver video</a></p>`:""}</details>` : "";
   return `<div class="ex ${complete?"complete":""}"><div class="exh"><span class="n">${esc(it.nombre)}</span><span class="dose">${esc(dose(it))}</span></div>${ctl}${extra}</div>`;
 }
 function renderSession(ses){
@@ -235,14 +262,14 @@ function renderSession(ses){
 }
 
 /* ---------- acciones ---------- */
-function currentSes(){ return R.sesiones.find(s=>s.id===location.hash.slice(1)); }
+function currentSes(){ return SES().find(s=>s.id===location.hash.slice(1)); }
 function mark(ses,k,val){
   const st=loadS(ses.id), wasMain=blockDone(st,ses,b=>b.tipo!=="calma"), wasAll=!!st.endAt;
   if(val) st.done[k]=true; else delete st.done[k];
   if(!st.startedAt && val) st.startedAt=Date.now();
   const nowMain=blockDone(st,ses,b=>b.tipo!=="calma"), nowAll=blockDone(st,ses,()=>true);
   if(nowMain && !st.mainAt) st.mainAt=Date.now();
-  if(nowAll && !st.endAt){ st.endAt=Date.now(); const h=store.get("bl:hist",[]); h.push({semana:R.id,sesion:ses.id,inicio:st.startedAt,fin:st.endAt}); store.set("bl:hist",h); }
+  if(nowAll && !st.endAt){ st.endAt=Date.now(); const h=store.get("bl:hist",[]); h.push({semana:R.id,nivel,sesion:ses.id,inicio:st.startedAt,fin:st.endAt}); store.set("bl:hist",h); }
   if(!nowAll) st.endAt=null;
   saveS(ses.id,st); render();
   if(nowAll && !wasAll) celebrate(ses,st,true);
@@ -283,6 +310,11 @@ document.addEventListener("click",e=>{
   if(ib){ const [bi,ii]=ib.dataset.int.split("-").map(Number); runItem(ses,bi,ii,0); return; }
   const bb=t.closest("[data-block]");
   if(bb){ runBlock(ses,Number(bb.dataset.block)); }
+});
+document.addEventListener("click",e=>{
+  const nv=e.target.closest("[data-nivel]");
+  if(nv){ nivel=nv.dataset.nivel; store.set("bl:nivel",nivel); location.hash=""; render(); return; }
+  if(e.target.closest("[data-goto-nivel]")){ location.hash="nivel"; }
 });
 document.addEventListener("click",e=>{
   if(!e.target.closest("[data-voz]")) return;
