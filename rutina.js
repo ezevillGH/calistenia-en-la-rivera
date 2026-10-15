@@ -185,8 +185,8 @@ window.RUTINA = {
        "seg": 30,
        "nombre": "Australians",
        "claves": [
-        "Escápulas juntas sin exagerar",
-        "Core y lumbar firmes",
+        "Hombros atrás y abajo",
+        "Core firme, cuerpo en tabla",
         "La barra llega debajo del pecho"
        ]
       },
@@ -197,8 +197,9 @@ window.RUTINA = {
        "seg": 35,
        "nombre": "Sentadilla",
        "claves": [
-        "Talones apoyados, pies apenas abiertos",
-        "Torso recto, core activo"
+        "Talones apoyados, espalda recta",
+        "Abrí los pies lo que tu cuerpo necesite",
+        "Bajá hasta 90° o más"
        ]
       }
      ]
@@ -216,6 +217,7 @@ window.RUTINA = {
        "nombre": "Dominada negativa",
        "claves": [
         "Subí con salto o con el cajón",
+        "Hombros lejos de las orejas",
         "Bajá en 3 a 5 segundos hasta brazos estirados"
        ]
       },
@@ -226,8 +228,8 @@ window.RUTINA = {
        "descanso": 60,
        "nombre": "Australians",
        "claves": [
-        "Escápulas juntas sin exagerar",
-        "Core y lumbar firmes",
+        "Hombros atrás y abajo",
+        "Core firme, cuerpo en tabla",
         "La barra llega debajo del pecho"
        ]
       },
@@ -238,7 +240,8 @@ window.RUTINA = {
        "descanso": 60,
        "nombre": "Fondos de tríceps en cajón",
        "claves": [
-        "Piernas juntas, glúteos y core activos",
+        "Quedate cerca del cajón: si te alejás, sufre el hombro",
+        "Piernas juntas, core activo",
         "Bajá hasta 90° si la movilidad lo permite"
        ]
       },
@@ -250,7 +253,8 @@ window.RUTINA = {
        "nombre": "Estocadas",
        "claves": [
         "Tronco recto",
-        "La rodilla de adelante no pasa la punta del pie"
+        "Rodilla alineada con el tobillo",
+        "En cemento, no apoyes la rodilla"
        ]
       },
       {
@@ -440,6 +444,7 @@ window.RUTINA = {
        "nombre": "Dominada negativa",
        "claves": [
         "Subí con salto o con el cajón",
+        "Hombros lejos de las orejas",
         "Bajá en 3 a 5 segundos hasta brazos estirados"
        ]
       },
@@ -451,9 +456,9 @@ window.RUTINA = {
        "facil": "Fondos de tríceps en cajón",
        "nombre": "Fondos en paralelas",
        "claves": [
-        "Rechazo escapular arriba",
-        "Pies apenas delante del ombligo",
-        "Bajá hasta codo a 90°, codos hacia atrás"
+        "Sé un solo bloque: core activo, pies delante del ombligo",
+        "Hombros lejos de las orejas",
+        "Bajá hasta que el hombro quede alineado con el codo"
        ]
       },
       {
@@ -463,8 +468,8 @@ window.RUTINA = {
        "descanso": 75,
        "nombre": "Australians",
        "claves": [
-        "Escápulas juntas sin exagerar",
-        "Core y lumbar firmes",
+        "Hombros atrás y abajo",
+        "Core firme, cuerpo en tabla",
         "La barra llega debajo del pecho"
        ]
       },
@@ -476,7 +481,8 @@ window.RUTINA = {
        "facil": "Con rodillas apoyadas",
        "nombre": "Flexiones",
        "claves": [
-        "Lumbar sin caer ni subir",
+        "Marcá un poco el hollow: empujá el piso",
+        "Cola ni arriba ni hundida",
         "Codos sin abrirse a los costados"
        ]
       },
@@ -487,8 +493,9 @@ window.RUTINA = {
        "descanso": 60,
        "nombre": "Sentadilla",
        "claves": [
-        "Talones apoyados, pies apenas abiertos",
-        "Torso recto, core activo"
+        "Talones apoyados, espalda recta",
+        "Abrí los pies lo que tu cuerpo necesite",
+        "Bajá hasta 90° o más"
        ]
       }
      ]
@@ -505,9 +512,9 @@ window.RUTINA = {
        "descanso": 120,
        "nombre": "Dominadas",
        "claves": [
-        "Arrancá con codos bloqueados",
-        "Mentón por arriba de la barra",
-        "Sin patear ni balancearte"
+        "Pies apenas delante del ombligo, core activo",
+        "Hombros lejos de las orejas",
+        "Codos a 45°, mentón por arriba de la barra"
        ]
       },
       {
@@ -517,9 +524,9 @@ window.RUTINA = {
        "descanso": 90,
        "nombre": "Fondos en paralelas",
        "claves": [
-        "Rechazo escapular arriba",
-        "Pies apenas delante del ombligo",
-        "Bajá hasta codo a 90°, codos hacia atrás"
+        "Sé un solo bloque: core activo, pies delante del ombligo",
+        "Hombros lejos de las orejas",
+        "Bajá hasta que el hombro quede alineado con el codo"
        ]
       },
       {
@@ -549,8 +556,9 @@ window.RUTINA = {
        "descanso": 45,
        "nombre": "Sentadilla",
        "claves": [
-        "Talones apoyados, pies apenas abiertos",
-        "Torso recto, core activo"
+        "Talones apoyados, espalda recta",
+        "Abrí los pies lo que tu cuerpo necesite",
+        "Bajá hasta 90° o más"
        ]
       }
      ]
@@ -634,9 +642,9 @@ window.RUTINA = {
        "descanso": 90,
        "nombre": "Fondos en barra",
        "claves": [
-        "Codos bloqueados al empezar",
-        "Rechazo escapular",
-        "Codos atrás hasta 90°"
+        "Codos hacia atrás, no afuera",
+        "Rechazo escapular arriba",
+        "Bajá hasta 90°"
        ]
       },
       {
@@ -742,7 +750,7 @@ window.RUTINA = {
   },
   {
    "id": "b-a",
-   "nombre": "Sesión A · Tirón y core",
+   "nombre": "Sesión A · Cuerpo completo",
    "sub": "Martes o miércoles · ~50 min",
    "nivel": "basico",
    "bloques": [
@@ -842,12 +850,22 @@ window.RUTINA = {
       {
        "tipo": "reps",
        "series": 1,
+       "reps": "5",
+       "seg": 30,
+       "claves": [
+        "Si no llegás, apoyá las rodillas"
+       ],
+       "nombre": "Flexiones"
+      },
+      {
+       "tipo": "reps",
+       "series": 1,
        "reps": "6",
        "seg": 30,
        "nombre": "Australians",
        "claves": [
-        "Escápulas juntas sin exagerar",
-        "Core y lumbar firmes",
+        "Hombros atrás y abajo",
+        "Core firme, cuerpo en tabla",
         "La barra llega debajo del pecho"
        ]
       },
@@ -858,8 +876,9 @@ window.RUTINA = {
        "seg": 35,
        "nombre": "Sentadilla",
        "claves": [
-        "Talones apoyados, pies apenas abiertos",
-        "Torso recto, core activo"
+        "Talones apoyados, espalda recta",
+        "Abrí los pies lo que tu cuerpo necesite",
+        "Bajá hasta 90° o más"
        ]
       }
      ]
@@ -876,7 +895,21 @@ window.RUTINA = {
        "nombre": "Dominada negativa",
        "claves": [
         "Subí con salto o con el cajón",
+        "Hombros lejos de las orejas",
         "Bajá en 3 a 5 segundos hasta brazos estirados"
+       ]
+      },
+      {
+       "tipo": "reps",
+       "series": 3,
+       "reps": "6–8",
+       "descanso": 75,
+       "facil": "Con rodillas apoyadas",
+       "nombre": "Flexiones",
+       "claves": [
+        "Marcá un poco el hollow: empujá el piso",
+        "Cola ni arriba ni hundida",
+        "Codos sin abrirse a los costados"
        ]
       },
       {
@@ -886,19 +919,21 @@ window.RUTINA = {
        "descanso": 75,
        "nombre": "Australians",
        "claves": [
-        "Escápulas juntas sin exagerar",
-        "Core y lumbar firmes",
+        "Hombros atrás y abajo",
+        "Core firme, cuerpo en tabla",
         "La barra llega debajo del pecho"
        ]
       },
       {
-       "tipo": "tiempo",
+       "tipo": "reps",
        "series": 3,
-       "seg": 15,
-       "descanso": 45,
-       "nombre": "Colgado activo",
+       "reps": "12–15",
+       "descanso": 60,
+       "nombre": "Sentadilla",
        "claves": [
-        "Hombros lejos de las orejas"
+        "Talones apoyados, espalda recta",
+        "Abrí los pies lo que tu cuerpo necesite",
+        "Bajá hasta 90° o más"
        ]
       },
       {
@@ -922,13 +957,6 @@ window.RUTINA = {
         "Desde colgado activo, girá lento",
         "Si recién empezás, hacé medio recorrido"
        ]
-      },
-      {
-       "tipo": "reps",
-       "series": 3,
-       "reps": "12",
-       "descanso": 45,
-       "nombre": "Superman"
       },
       {
        "tipo": "tabata",
@@ -992,7 +1020,7 @@ window.RUTINA = {
   },
   {
    "id": "b-b",
-   "nombre": "Sesión B · Empuje y piernas",
+   "nombre": "Sesión B · Cuerpo completo",
    "sub": "Jueves o viernes · ~50 min",
    "nivel": "basico",
    "bloques": [
@@ -1102,12 +1130,25 @@ window.RUTINA = {
       {
        "tipo": "reps",
        "series": 1,
+       "reps": "6",
+       "seg": 30,
+       "nombre": "Australians",
+       "claves": [
+        "Hombros atrás y abajo",
+        "Core firme, cuerpo en tabla",
+        "La barra llega debajo del pecho"
+       ]
+      },
+      {
+       "tipo": "reps",
+       "series": 1,
        "reps": "10",
        "seg": 35,
        "nombre": "Sentadilla",
        "claves": [
-        "Talones apoyados, pies apenas abiertos",
-        "Torso recto, core activo"
+        "Talones apoyados, espalda recta",
+        "Abrí los pies lo que tu cuerpo necesite",
+        "Bajá hasta 90° o más"
        ]
       }
      ]
@@ -1119,31 +1160,9 @@ window.RUTINA = {
       {
        "tipo": "reps",
        "series": 3,
-       "reps": "6–8",
-       "descanso": 75,
-       "facil": "Con rodillas apoyadas",
-       "nombre": "Flexiones",
-       "claves": [
-        "Lumbar sin caer ni subir",
-        "Codos sin abrirse a los costados"
-       ]
-      },
-      {
-       "tipo": "reps",
-       "series": 3,
-       "reps": "8–10",
-       "descanso": 75,
-       "nombre": "Fondos de tríceps en cajón",
-       "claves": [
-        "Piernas juntas, glúteos y core activos",
-        "Bajá hasta 90° si la movilidad lo permite"
-       ]
-      },
-      {
-       "tipo": "reps",
-       "series": 3,
        "reps": "3 · bajada de 4 s",
        "descanso": 90,
+       "facil": "Fondos de tríceps en cajón",
        "nombre": "Fondos negativos en paralelas",
        "claves": [
         "Subí con salto",
@@ -1153,12 +1172,35 @@ window.RUTINA = {
       {
        "tipo": "reps",
        "series": 3,
-       "reps": "12–15",
-       "descanso": 60,
-       "nombre": "Sentadilla",
+       "reps": "6–8",
+       "descanso": 75,
+       "nombre": "Australians",
        "claves": [
-        "Talones apoyados, pies apenas abiertos",
-        "Torso recto, core activo"
+        "Hombros atrás y abajo",
+        "Core firme, cuerpo en tabla",
+        "La barra llega debajo del pecho"
+       ]
+      },
+      {
+       "tipo": "reps",
+       "series": 3,
+       "reps": "8–10",
+       "descanso": 75,
+       "nombre": "Fondos de tríceps en cajón",
+       "claves": [
+        "Quedate cerca del cajón: si te alejás, sufre el hombro",
+        "Piernas juntas, core activo",
+        "Bajá hasta 90° si la movilidad lo permite"
+       ]
+      },
+      {
+       "tipo": "tiempo",
+       "series": 3,
+       "seg": 15,
+       "descanso": 45,
+       "nombre": "Colgado activo",
+       "claves": [
+        "Hombros lejos de las orejas"
        ]
       },
       {
@@ -1169,7 +1211,8 @@ window.RUTINA = {
        "nombre": "Estocadas",
        "claves": [
         "Tronco recto",
-        "La rodilla de adelante no pasa la punta del pie"
+        "Rodilla alineada con el tobillo",
+        "En cemento, no apoyes la rodilla"
        ]
       },
       {
@@ -1357,8 +1400,8 @@ window.RUTINA = {
        "seg": 30,
        "nombre": "Australians",
        "claves": [
-        "Escápulas juntas sin exagerar",
-        "Core y lumbar firmes",
+        "Hombros atrás y abajo",
+        "Core firme, cuerpo en tabla",
         "La barra llega debajo del pecho"
        ]
       },
@@ -1369,9 +1412,9 @@ window.RUTINA = {
        "seg": 30,
        "nombre": "Dominadas",
        "claves": [
-        "Arrancá con codos bloqueados",
-        "Mentón por arriba de la barra",
-        "Sin patear ni balancearte"
+        "Pies apenas delante del ombligo, core activo",
+        "Hombros lejos de las orejas",
+        "Codos a 45°, mentón por arriba de la barra"
        ]
       }
      ]
@@ -1398,9 +1441,9 @@ window.RUTINA = {
        "descanso": 120,
        "nombre": "Dominadas",
        "claves": [
-        "Arrancá con codos bloqueados",
-        "Mentón por arriba de la barra",
-        "Sin patear ni balancearte"
+        "Pies apenas delante del ombligo, core activo",
+        "Hombros lejos de las orejas",
+        "Codos a 45°, mentón por arriba de la barra"
        ]
       },
       {
@@ -1441,8 +1484,9 @@ window.RUTINA = {
        "descanso": 45,
        "nombre": "Sentadilla",
        "claves": [
-        "Talones apoyados, pies apenas abiertos",
-        "Torso recto, core activo"
+        "Talones apoyados, espalda recta",
+        "Abrí los pies lo que tu cuerpo necesite",
+        "Bajá hasta 90° o más"
        ]
       },
       {
@@ -1611,7 +1655,8 @@ window.RUTINA = {
        "seg": 30,
        "nombre": "Flexiones",
        "claves": [
-        "Lumbar sin caer ni subir",
+        "Marcá un poco el hollow: empujá el piso",
+        "Cola ni arriba ni hundida",
         "Codos sin abrirse a los costados"
        ]
       },
@@ -1622,9 +1667,9 @@ window.RUTINA = {
        "seg": 30,
        "nombre": "Fondos en paralelas",
        "claves": [
-        "Rechazo escapular arriba",
-        "Pies apenas delante del ombligo",
-        "Bajá hasta codo a 90°, codos hacia atrás"
+        "Sé un solo bloque: core activo, pies delante del ombligo",
+        "Hombros lejos de las orejas",
+        "Bajá hasta que el hombro quede alineado con el codo"
        ]
       }
      ]
@@ -1666,9 +1711,9 @@ window.RUTINA = {
        "descanso": 90,
        "nombre": "Fondos en paralelas",
        "claves": [
-        "Rechazo escapular arriba",
-        "Pies apenas delante del ombligo",
-        "Bajá hasta codo a 90°, codos hacia atrás"
+        "Sé un solo bloque: core activo, pies delante del ombligo",
+        "Hombros lejos de las orejas",
+        "Bajá hasta que el hombro quede alineado con el codo"
        ]
       },
       {
@@ -1875,8 +1920,8 @@ window.RUTINA = {
        "seg": 30,
        "nombre": "Australians",
        "claves": [
-        "Escápulas juntas sin exagerar",
-        "Core y lumbar firmes",
+        "Hombros atrás y abajo",
+        "Core firme, cuerpo en tabla",
         "La barra llega debajo del pecho"
        ]
       },
@@ -1887,8 +1932,9 @@ window.RUTINA = {
        "seg": 40,
        "nombre": "Sentadilla",
        "claves": [
-        "Talones apoyados, pies apenas abiertos",
-        "Torso recto, core activo"
+        "Talones apoyados, espalda recta",
+        "Abrí los pies lo que tu cuerpo necesite",
+        "Bajá hasta 90° o más"
        ]
       }
      ]
@@ -1947,8 +1993,8 @@ window.RUTINA = {
        "descanso": 75,
        "nombre": "Australians",
        "claves": [
-        "Escápulas juntas sin exagerar",
-        "Core y lumbar firmes",
+        "Hombros atrás y abajo",
+        "Core firme, cuerpo en tabla",
         "La barra llega debajo del pecho"
        ]
       },
@@ -1960,6 +2006,7 @@ window.RUTINA = {
        "nombre": "Dominada negativa",
        "claves": [
         "Subí con salto o con el cajón",
+        "Hombros lejos de las orejas",
         "Bajá en 3 a 5 segundos hasta brazos estirados"
        ]
       },
@@ -2144,7 +2191,8 @@ window.RUTINA = {
        "seg": 30,
        "nombre": "Flexiones",
        "claves": [
-        "Lumbar sin caer ni subir",
+        "Marcá un poco el hollow: empujá el piso",
+        "Cola ni arriba ni hundida",
         "Codos sin abrirse a los costados"
        ]
       },
@@ -2202,7 +2250,8 @@ window.RUTINA = {
        "nombre": "Estocadas",
        "claves": [
         "Tronco recto",
-        "La rodilla de adelante no pasa la punta del pie"
+        "Rodilla alineada con el tobillo",
+        "En cemento, no apoyes la rodilla"
        ]
       },
       {
@@ -2212,7 +2261,8 @@ window.RUTINA = {
        "descanso": 60,
        "nombre": "Flexiones",
        "claves": [
-        "Lumbar sin caer ni subir",
+        "Marcá un poco el hollow: empujá el piso",
+        "Cola ni arriba ni hundida",
         "Codos sin abrirse a los costados"
        ]
       },
@@ -2223,9 +2273,9 @@ window.RUTINA = {
        "descanso": 75,
        "nombre": "Fondos en paralelas",
        "claves": [
-        "Rechazo escapular arriba",
-        "Pies apenas delante del ombligo",
-        "Bajá hasta codo a 90°, codos hacia atrás"
+        "Sé un solo bloque: core activo, pies delante del ombligo",
+        "Hombros lejos de las orejas",
+        "Bajá hasta que el hombro quede alineado con el codo"
        ]
       },
       {
@@ -2409,8 +2459,8 @@ window.RUTINA = {
        "seg": 30,
        "nombre": "Australians",
        "claves": [
-        "Escápulas juntas sin exagerar",
-        "Core y lumbar firmes",
+        "Hombros atrás y abajo",
+        "Core firme, cuerpo en tabla",
         "La barra llega debajo del pecho"
        ]
       },
@@ -2421,9 +2471,9 @@ window.RUTINA = {
        "seg": 35,
        "nombre": "Dominadas",
        "claves": [
-        "Arrancá con codos bloqueados",
-        "Mentón por arriba de la barra",
-        "Sin patear ni balancearte"
+        "Pies apenas delante del ombligo, core activo",
+        "Hombros lejos de las orejas",
+        "Codos a 45°, mentón por arriba de la barra"
        ]
       }
      ]
@@ -2653,7 +2703,8 @@ window.RUTINA = {
        "seg": 30,
        "nombre": "Flexiones",
        "claves": [
-        "Lumbar sin caer ni subir",
+        "Marcá un poco el hollow: empujá el piso",
+        "Cola ni arriba ni hundida",
         "Codos sin abrirse a los costados"
        ]
       },
@@ -2664,9 +2715,9 @@ window.RUTINA = {
        "seg": 30,
        "nombre": "Fondos en paralelas",
        "claves": [
-        "Rechazo escapular arriba",
-        "Pies apenas delante del ombligo",
-        "Bajá hasta codo a 90°, codos hacia atrás"
+        "Sé un solo bloque: core activo, pies delante del ombligo",
+        "Hombros lejos de las orejas",
+        "Bajá hasta que el hombro quede alineado con el codo"
        ]
       }
      ]
