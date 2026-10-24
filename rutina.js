@@ -1,9 +1,9 @@
-/* Generado por build.js desde c1s1.js. No editar a mano: editar la rutina fuente y volver a generar. */
+/* Generado por build.js desde c1s2.js. No editar a mano: editar la rutina fuente y volver a generar. */
 window.RUTINA = {
- "id": "c1s1",
- "semana": "Semana del 17 al 23 de octubre",
+ "id": "c1s2",
+ "semana": "Semana del 24 al 30 de octubre",
  "ciclo": 1,
- "semanaCiclo": 1,
+ "semanaCiclo": 2,
  "descarga": false,
  "niveles": [
   {
@@ -124,7 +124,7 @@ window.RUTINA = {
       {
        "tipo": "tiempo",
        "series": 2,
-       "seg": 10,
+       "seg": 12,
        "descanso": 20,
        "nombre": "Hollow body",
        "claves": [
@@ -212,6 +212,25 @@ window.RUTINA = {
       {
        "tipo": "reps",
        "series": 2,
+       "reps": "1 intento · medio recorrido",
+       "descanso": 60,
+       "nombre": "Skin the cat",
+       "claves": [
+        "Desde colgado activo, girá lento",
+        "Al pasar, la cadera baja a la altura del hombro",
+        "Si recién empezás, hacé medio recorrido"
+       ]
+      },
+      {
+       "tipo": "reps",
+       "series": 2,
+       "reps": "1 intento",
+       "descanso": 60,
+       "nombre": "Vela"
+      },
+      {
+       "tipo": "reps",
+       "series": 2,
        "reps": "3 · bajada de 5 s",
        "descanso": 90,
        "nombre": "Dominada negativa",
@@ -256,24 +275,6 @@ window.RUTINA = {
         "Rodilla alineada con el tobillo",
         "En cemento, no apoyes la rodilla"
        ]
-      },
-      {
-       "tipo": "reps",
-       "series": 2,
-       "reps": "1 intento · medio recorrido",
-       "descanso": 60,
-       "nombre": "Skin the cat",
-       "claves": [
-        "Desde colgado activo, girá lento",
-        "Si recién empezás, hacé medio recorrido"
-       ]
-      },
-      {
-       "tipo": "reps",
-       "series": 2,
-       "reps": "1 intento",
-       "descanso": 60,
-       "nombre": "Vela"
       }
      ]
     },
@@ -285,18 +286,19 @@ window.RUTINA = {
       {
        "tipo": "tiempo",
        "series": 3,
-       "seg": 5,
+       "seg": 6,
        "descanso": 60,
        "nombre": "Tuck back lever",
        "claves": [
-        "Rodillas al pecho",
-        "Glúteos y abdomen apretados"
+        "Cadera a la misma altura que el hombro",
+        "Glúteos apretados sin cerrar la cadera",
+        "Si se cae la postura, bajá"
        ]
       },
       {
        "tipo": "tiempo",
        "series": 3,
-       "seg": 10,
+       "seg": 12,
        "descanso": 45,
        "nombre": "Ranita",
        "claves": [
@@ -308,9 +310,16 @@ window.RUTINA = {
       {
        "tipo": "tiempo",
        "series": 3,
-       "seg": 8,
+       "seg": 10,
        "descanso": 60,
        "nombre": "L-sit en paralelas"
+      },
+      {
+       "tipo": "tiempo",
+       "series": 2,
+       "seg": 20,
+       "descanso": 60,
+       "nombre": "Vertical con pecho a la pared"
       },
       {
        "tipo": "reps",
@@ -322,13 +331,6 @@ window.RUTINA = {
         "Cadera alta, forma de V invertida",
         "La cabeza va adelante de las manos"
        ]
-      },
-      {
-       "tipo": "tiempo",
-       "series": 2,
-       "seg": 15,
-       "descanso": 60,
-       "nombre": "Vertical con pecho a la pared"
       }
      ]
     },
@@ -396,6 +398,32 @@ window.RUTINA = {
      "nivel": "avanzado",
      "items": [
       {
+       "tipo": "tiempo",
+       "series": 3,
+       "seg": 10,
+       "descanso": 90,
+       "nombre": "Tuck front lever",
+       "claves": [
+        "Juntá los omóplatos sin exagerar",
+        "Codos bloqueados",
+        "Si se cae la cadera, bajá o pasá a la más fácil"
+       ]
+      },
+      {
+       "tipo": "tiempo",
+       "series": 3,
+       "seg": 7,
+       "descanso": 90,
+       "nombre": "Tuck planche"
+      },
+      {
+       "tipo": "reps",
+       "series": 3,
+       "reps": "1 intento · buscá balance",
+       "descanso": 45,
+       "nombre": "Intentos de vertical libre"
+      },
+      {
        "tipo": "reps",
        "series": 3,
        "reps": "2–3",
@@ -407,27 +435,6 @@ window.RUTINA = {
         "Bajá controlado"
        ],
        "video": "https://youtu.be/rpBA5fwVBkI"
-      },
-      {
-       "tipo": "tiempo",
-       "series": 3,
-       "seg": 8,
-       "descanso": 90,
-       "nombre": "Tuck front lever"
-      },
-      {
-       "tipo": "reps",
-       "series": 3,
-       "reps": "1 intento · buscá balance",
-       "descanso": 45,
-       "nombre": "Intentos de vertical libre"
-      },
-      {
-       "tipo": "tiempo",
-       "series": 3,
-       "seg": 6,
-       "descanso": 90,
-       "nombre": "Tuck planche"
       }
      ]
     },
@@ -439,7 +446,7 @@ window.RUTINA = {
       {
        "tipo": "reps",
        "series": 3,
-       "reps": "3–5 · bajada lenta",
+       "reps": "4–5 · bajada lenta",
        "descanso": 90,
        "nombre": "Dominada negativa",
        "claves": [
@@ -451,7 +458,7 @@ window.RUTINA = {
       {
        "tipo": "reps",
        "series": 3,
-       "reps": "4–6",
+       "reps": "5–6",
        "descanso": 90,
        "facil": "Fondos de tríceps en cajón",
        "nombre": "Fondos en paralelas",
@@ -464,7 +471,7 @@ window.RUTINA = {
       {
        "tipo": "reps",
        "series": 3,
-       "reps": "6–8",
+       "reps": "7–9",
        "descanso": 75,
        "nombre": "Australians",
        "claves": [
@@ -476,7 +483,7 @@ window.RUTINA = {
       {
        "tipo": "reps",
        "series": 3,
-       "reps": "6–8",
+       "reps": "7–9",
        "descanso": 75,
        "facil": "Con rodillas apoyadas",
        "nombre": "Flexiones",
@@ -489,7 +496,7 @@ window.RUTINA = {
       {
        "tipo": "reps",
        "series": 3,
-       "reps": "12",
+       "reps": "13",
        "descanso": 60,
        "nombre": "Sentadilla",
        "claves": [
@@ -508,7 +515,7 @@ window.RUTINA = {
       {
        "tipo": "reps",
        "series": 3,
-       "reps": "5–8",
+       "reps": "6–8",
        "descanso": 120,
        "nombre": "Dominadas",
        "claves": [
@@ -520,7 +527,7 @@ window.RUTINA = {
       {
        "tipo": "reps",
        "series": 3,
-       "reps": "8–12",
+       "reps": "9–12",
        "descanso": 90,
        "nombre": "Fondos en paralelas",
        "claves": [
@@ -532,15 +539,15 @@ window.RUTINA = {
       {
        "tipo": "reps",
        "series": 3,
-       "reps": "8–10",
+       "reps": "9–11",
        "descanso": 75,
        "nombre": "Australians con pies elevados",
        "video": "https://youtu.be/NW1OFbpEKNM"
       },
       {
        "tipo": "emom",
-       "nombre": "EMOM 8'",
-       "minutos": 8,
+       "nombre": "EMOM 9'",
+       "minutos": 9,
        "ejercicios": [
         "4 dominadas",
         "10 flexiones"
@@ -571,7 +578,7 @@ window.RUTINA = {
       {
        "tipo": "reps",
        "series": 3,
-       "reps": "8–10 c/pierna",
+       "reps": "9–10 c/pierna",
        "descanso": 90,
        "nombre": "Sentadilla búlgara",
        "claves": [
@@ -582,7 +589,7 @@ window.RUTINA = {
       {
        "tipo": "reps",
        "series": 3,
-       "reps": "5 c/pierna",
+       "reps": "6 c/pierna",
        "descanso": 90,
        "nombre": "Pistol asistida",
        "claves": [
@@ -593,7 +600,7 @@ window.RUTINA = {
       {
        "tipo": "reps",
        "series": 3,
-       "reps": "6",
+       "reps": "7",
        "descanso": 90,
        "nombre": "Saltos al cajón",
        "claves": [
@@ -617,7 +624,7 @@ window.RUTINA = {
       {
        "tipo": "reps",
        "series": 3,
-       "reps": "20",
+       "reps": "22",
        "descanso": 30,
        "nombre": "Elevaciones de talones"
       }
@@ -630,15 +637,27 @@ window.RUTINA = {
      "items": [
       {
        "tipo": "reps",
-       "series": 4,
+       "series": 3,
        "reps": "5–6",
+       "descanso": 90,
+       "nombre": "Dragon flag",
+       "claves": [
+        "Cuerpo rígido en línea recta",
+        "Bajá lento sin tocar el piso"
+       ],
+       "video": "https://youtu.be/gallneRBlDk"
+      },
+      {
+       "tipo": "reps",
+       "series": 4,
+       "reps": "6",
        "descanso": 120,
        "nombre": "Dominadas explosivas"
       },
       {
        "tipo": "reps",
        "series": 4,
-       "reps": "8–10",
+       "reps": "9–10",
        "descanso": 90,
        "nombre": "Fondos en barra",
        "claves": [
@@ -650,26 +669,14 @@ window.RUTINA = {
       {
        "tipo": "reps",
        "series": 3,
-       "reps": "6 c/pierna",
+       "reps": "6–7 c/pierna",
        "descanso": 75,
        "nombre": "Pistol"
       },
       {
-       "tipo": "reps",
-       "series": 3,
-       "reps": "5",
-       "descanso": 90,
-       "nombre": "Dragon flag",
-       "claves": [
-        "Cuerpo rígido en línea recta",
-        "Bajá lento sin tocar el piso"
-       ],
-       "video": "https://youtu.be/gallneRBlDk"
-      },
-      {
        "tipo": "emom",
-       "nombre": "EMOM 8'",
-       "minutos": 8,
+       "nombre": "EMOM 9'",
+       "minutos": 9,
        "ejercicios": [
         "4 dominadas al pecho",
         "6 fondos en barra"
@@ -889,8 +896,20 @@ window.RUTINA = {
      "items": [
       {
        "tipo": "reps",
+       "series": 2,
+       "reps": "1 intento · medio recorrido",
+       "descanso": 60,
+       "nombre": "Skin the cat",
+       "claves": [
+        "Desde colgado activo, girá lento",
+        "Al pasar, la cadera baja a la altura del hombro",
+        "Si recién empezás, hacé medio recorrido"
+       ]
+      },
+      {
+       "tipo": "reps",
        "series": 3,
-       "reps": "3 · bajada de 5 s",
+       "reps": "3–4 · bajada de 5 s",
        "descanso": 90,
        "nombre": "Dominada negativa",
        "claves": [
@@ -902,7 +921,7 @@ window.RUTINA = {
       {
        "tipo": "reps",
        "series": 3,
-       "reps": "6–8",
+       "reps": "7–9",
        "descanso": 75,
        "facil": "Con rodillas apoyadas",
        "nombre": "Flexiones",
@@ -915,7 +934,7 @@ window.RUTINA = {
       {
        "tipo": "reps",
        "series": 3,
-       "reps": "6–8",
+       "reps": "7–9",
        "descanso": 75,
        "nombre": "Australians",
        "claves": [
@@ -927,7 +946,7 @@ window.RUTINA = {
       {
        "tipo": "reps",
        "series": 3,
-       "reps": "12–15",
+       "reps": "13–15",
        "descanso": 60,
        "nombre": "Sentadilla",
        "claves": [
@@ -939,23 +958,12 @@ window.RUTINA = {
       {
        "tipo": "reps",
        "series": 3,
-       "reps": "6–8",
+       "reps": "7–8",
        "descanso": 60,
        "nombre": "Rodillas al pecho colgado",
        "claves": [
         "Sin balanceo",
         "Subí con el abdomen, bajá controlado"
-       ]
-      },
-      {
-       "tipo": "reps",
-       "series": 2,
-       "reps": "1 intento · medio recorrido",
-       "descanso": 60,
-       "nombre": "Skin the cat",
-       "claves": [
-        "Desde colgado activo, girá lento",
-        "Si recién empezás, hacé medio recorrido"
        ]
       },
       {
@@ -1159,8 +1167,15 @@ window.RUTINA = {
      "items": [
       {
        "tipo": "reps",
+       "series": 2,
+       "reps": "1 intento",
+       "descanso": 60,
+       "nombre": "Vela"
+      },
+      {
+       "tipo": "reps",
        "series": 3,
-       "reps": "3 · bajada de 4 s",
+       "reps": "3–4 · bajada de 4 s",
        "descanso": 90,
        "facil": "Fondos de tríceps en cajón",
        "nombre": "Fondos negativos en paralelas",
@@ -1172,7 +1187,7 @@ window.RUTINA = {
       {
        "tipo": "reps",
        "series": 3,
-       "reps": "6–8",
+       "reps": "7–9",
        "descanso": 75,
        "nombre": "Australians",
        "claves": [
@@ -1184,7 +1199,7 @@ window.RUTINA = {
       {
        "tipo": "reps",
        "series": 3,
-       "reps": "8–10",
+       "reps": "9–11",
        "descanso": 75,
        "nombre": "Fondos de tríceps en cajón",
        "claves": [
@@ -1196,7 +1211,7 @@ window.RUTINA = {
       {
        "tipo": "tiempo",
        "series": 3,
-       "seg": 15,
+       "seg": 20,
        "descanso": 45,
        "nombre": "Colgado activo",
        "claves": [
@@ -1206,7 +1221,7 @@ window.RUTINA = {
       {
        "tipo": "reps",
        "series": 3,
-       "reps": "8 c/pierna",
+       "reps": "9 c/pierna",
        "descanso": 60,
        "nombre": "Estocadas",
        "claves": [
@@ -1218,26 +1233,19 @@ window.RUTINA = {
       {
        "tipo": "reps",
        "series": 3,
-       "reps": "12",
+       "reps": "13",
        "descanso": 45,
        "nombre": "Puente de glúteos"
       },
       {
        "tipo": "tiempo",
        "series": 2,
-       "seg": 20,
+       "seg": 25,
        "descanso": 20,
        "claves": [
         "Una serie por lado"
        ],
        "nombre": "Plancha lateral"
-      },
-      {
-       "tipo": "reps",
-       "series": 2,
-       "reps": "1 intento",
-       "descanso": 60,
-       "nombre": "Vela"
       }
      ]
     },
@@ -1426,18 +1434,26 @@ window.RUTINA = {
       {
        "tipo": "tiempo",
        "series": 3,
-       "seg": 8,
+       "seg": 10,
        "descanso": 90,
        "nombre": "Tuck back lever",
        "claves": [
-        "Rodillas al pecho",
-        "Glúteos y abdomen apretados"
+        "Cadera a la misma altura que el hombro",
+        "Glúteos apretados sin cerrar la cadera",
+        "Si se cae la postura, bajá"
        ]
+      },
+      {
+       "tipo": "tiempo",
+       "series": 3,
+       "seg": 12,
+       "descanso": 60,
+       "nombre": "Aguante arriba de la dominada"
       },
       {
        "tipo": "reps",
        "series": 4,
-       "reps": "5–8",
+       "reps": "6–8",
        "descanso": 120,
        "nombre": "Dominadas",
        "claves": [
@@ -1449,7 +1465,7 @@ window.RUTINA = {
       {
        "tipo": "reps",
        "series": 3,
-       "reps": "6–8",
+       "reps": "7–8",
        "descanso": 90,
        "nombre": "Dominadas supinas",
        "video": "https://youtu.be/chkAAERq9PM"
@@ -1457,22 +1473,15 @@ window.RUTINA = {
       {
        "tipo": "reps",
        "series": 3,
-       "reps": "10",
+       "reps": "10–11",
        "descanso": 75,
        "nombre": "Australians con pies elevados",
        "video": "https://youtu.be/NW1OFbpEKNM"
       },
       {
-       "tipo": "tiempo",
-       "series": 3,
-       "seg": 10,
-       "descanso": 60,
-       "nombre": "Aguante arriba de la dominada"
-      },
-      {
        "tipo": "reps",
        "series": 3,
-       "reps": "6–8",
+       "reps": "7–8",
        "descanso": 60,
        "nombre": "Pies a la barra",
        "video": "https://youtu.be/hP2FF9x5Rk0"
@@ -1681,7 +1690,7 @@ window.RUTINA = {
       {
        "tipo": "tiempo",
        "series": 3,
-       "seg": 15,
+       "seg": 20,
        "descanso": 45,
        "nombre": "Ranita",
        "claves": [
@@ -1693,21 +1702,21 @@ window.RUTINA = {
       {
        "tipo": "tiempo",
        "series": 3,
-       "seg": 10,
+       "seg": 12,
        "descanso": 60,
        "nombre": "L-sit en paralelas"
       },
       {
        "tipo": "tiempo",
        "series": 3,
-       "seg": 20,
+       "seg": 25,
        "descanso": 60,
        "nombre": "Vertical con pecho a la pared"
       },
       {
        "tipo": "reps",
        "series": 4,
-       "reps": "8–12",
+       "reps": "9–12",
        "descanso": 90,
        "nombre": "Fondos en paralelas",
        "claves": [
@@ -1719,7 +1728,7 @@ window.RUTINA = {
       {
        "tipo": "reps",
        "series": 3,
-       "reps": "8",
+       "reps": "8–9",
        "descanso": 75,
        "nombre": "Flexiones en pica",
        "claves": [
@@ -1730,7 +1739,7 @@ window.RUTINA = {
       {
        "tipo": "reps",
        "series": 3,
-       "reps": "10–12",
+       "reps": "11–12",
        "descanso": 60,
        "nombre": "Flexiones declinadas"
       },
@@ -1946,7 +1955,7 @@ window.RUTINA = {
       {
        "tipo": "reps",
        "series": 4,
-       "reps": "8–10",
+       "reps": "9–10",
        "descanso": 90,
        "nombre": "Sentadilla goblet con kettlebell",
        "claves": [
@@ -1957,7 +1966,7 @@ window.RUTINA = {
       {
        "tipo": "reps",
        "series": 3,
-       "reps": "8–10 c/pierna",
+       "reps": "9–10 c/pierna",
        "descanso": 90,
        "nombre": "Sentadilla búlgara",
        "claves": [
@@ -1968,28 +1977,28 @@ window.RUTINA = {
       {
        "tipo": "reps",
        "series": 3,
-       "reps": "10 c/pierna",
+       "reps": "11 c/pierna",
        "descanso": 45,
        "nombre": "Puente de glúteos a una pierna"
       },
       {
        "tipo": "tiempo",
        "series": 3,
-       "seg": 30,
+       "seg": 35,
        "descanso": 45,
        "nombre": "Sentadilla sostenida a 90°"
       },
       {
        "tipo": "reps",
        "series": 3,
-       "reps": "20",
+       "reps": "22",
        "descanso": 30,
        "nombre": "Elevaciones de talones"
       },
       {
        "tipo": "reps",
        "series": 3,
-       "reps": "8–10",
+       "reps": "9–10",
        "descanso": 75,
        "nombre": "Australians",
        "claves": [
@@ -2001,7 +2010,7 @@ window.RUTINA = {
       {
        "tipo": "reps",
        "series": 2,
-       "reps": "3 · bajada de 5 s",
+       "reps": "4 · bajada de 5 s",
        "descanso": 90,
        "nombre": "Dominada negativa",
        "claves": [
@@ -2013,7 +2022,7 @@ window.RUTINA = {
       {
        "tipo": "tiempo",
        "series": 2,
-       "seg": 30,
+       "seg": 35,
        "descanso": 20,
        "claves": [
         "Una serie por lado"
@@ -2212,7 +2221,7 @@ window.RUTINA = {
       {
        "tipo": "reps",
        "series": 4,
-       "reps": "6",
+       "reps": "7",
        "descanso": 90,
        "nombre": "Saltos al cajón",
        "claves": [
@@ -2223,7 +2232,7 @@ window.RUTINA = {
       {
        "tipo": "reps",
        "series": 3,
-       "reps": "5–6 c/pierna",
+       "reps": "6 c/pierna",
        "descanso": 90,
        "nombre": "Pistol asistida",
        "claves": [
@@ -2234,7 +2243,7 @@ window.RUTINA = {
       {
        "tipo": "reps",
        "series": 3,
-       "reps": "15",
+       "reps": "16",
        "descanso": 60,
        "nombre": "Swing con kettlebell",
        "claves": [
@@ -2245,7 +2254,7 @@ window.RUTINA = {
       {
        "tipo": "reps",
        "series": 3,
-       "reps": "10 c/pierna",
+       "reps": "11 c/pierna",
        "descanso": 60,
        "nombre": "Estocadas",
        "claves": [
@@ -2257,7 +2266,7 @@ window.RUTINA = {
       {
        "tipo": "reps",
        "series": 3,
-       "reps": "10–12",
+       "reps": "11–12",
        "descanso": 60,
        "nombre": "Flexiones",
        "claves": [
@@ -2269,7 +2278,7 @@ window.RUTINA = {
       {
        "tipo": "reps",
        "series": 2,
-       "reps": "8–10",
+       "reps": "9–10",
        "descanso": 75,
        "nombre": "Fondos en paralelas",
        "claves": [
@@ -2485,9 +2494,14 @@ window.RUTINA = {
       {
        "tipo": "tiempo",
        "series": 4,
-       "seg": 10,
+       "seg": 12,
        "descanso": 90,
-       "nombre": "Tuck front lever"
+       "nombre": "Tuck front lever",
+       "claves": [
+        "Juntá los omóplatos sin exagerar",
+        "Codos bloqueados",
+        "Si se cae la cadera, bajá o pasá a la más fácil"
+       ]
       },
       {
        "tipo": "reps",
@@ -2495,7 +2509,23 @@ window.RUTINA = {
        "reps": "2 · bajada lenta",
        "descanso": 120,
        "nombre": "Negativa de tuck front lever",
+       "claves": [
+        "Desde la vela, bajá lento",
+        "Omóplatos juntos, codos bloqueados"
+       ],
        "video": "https://youtu.be/mPayO9fo8d4"
+      },
+      {
+       "tipo": "reps",
+       "series": 3,
+       "reps": "6",
+       "descanso": 90,
+       "nombre": "Dragon flag",
+       "claves": [
+        "Cuerpo rígido en línea recta",
+        "Bajá lento sin tocar el piso"
+       ],
+       "video": "https://youtu.be/gallneRBlDk"
       },
       {
        "tipo": "reps",
@@ -2513,7 +2543,7 @@ window.RUTINA = {
       {
        "tipo": "reps",
        "series": 3,
-       "reps": "6–8",
+       "reps": "7–8",
        "descanso": 90,
        "nombre": "Dominadas al pecho",
        "video": "https://youtu.be/JgfsYptTaS0"
@@ -2521,19 +2551,7 @@ window.RUTINA = {
       {
        "tipo": "reps",
        "series": 3,
-       "reps": "5–6",
-       "descanso": 90,
-       "nombre": "Dragon flag",
-       "claves": [
-        "Cuerpo rígido en línea recta",
-        "Bajá lento sin tocar el piso"
-       ],
-       "video": "https://youtu.be/gallneRBlDk"
-      },
-      {
-       "tipo": "reps",
-       "series": 3,
-       "reps": "6 c/pierna",
+       "reps": "6–7 c/pierna",
        "descanso": 75,
        "nombre": "Pistol"
       },
@@ -2736,37 +2754,37 @@ window.RUTINA = {
       {
        "tipo": "tiempo",
        "series": 4,
-       "seg": 8,
+       "seg": 10,
        "descanso": 90,
        "nombre": "Tuck planche"
       },
       {
+       "tipo": "tiempo",
+       "series": 3,
+       "seg": 18,
+       "descanso": 60,
+       "nombre": "L-sit en paralelas"
+      },
+      {
        "tipo": "reps",
        "series": 3,
-       "reps": "5–6",
+       "reps": "6",
        "descanso": 120,
        "nombre": "Flexiones de vertical en pared"
       },
       {
        "tipo": "reps",
        "series": 4,
-       "reps": "6–8",
+       "reps": "7–8",
        "descanso": 90,
        "nombre": "Fondos en anillas"
       },
       {
        "tipo": "reps",
        "series": 4,
-       "reps": "8–10",
+       "reps": "9–10",
        "descanso": 90,
        "nombre": "Flexiones con palmada"
-      },
-      {
-       "tipo": "tiempo",
-       "series": 3,
-       "seg": 15,
-       "descanso": 60,
-       "nombre": "L-sit en paralelas"
       },
       {
        "tipo": "emom",
