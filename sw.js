@@ -1,7 +1,7 @@
 /* Modo sin conexión: siempre intenta bajar lo último (así llega la rutina nueva)
    y si no hay señal usa la copia guardada. */
-const CACHE = "cer-v2";
-const FILES = ["./", "index.html", "rutina.js", "logo.webp", "manifest.webmanifest"];
+const CACHE = "cer-v3";
+const FILES = ["./", "index.html", "rutina.js", "catalogo.js", "reglas.js", "logo.webp", "manifest.webmanifest"];
 
 self.addEventListener("install", e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(FILES)).then(() => self.skipWaiting()));
@@ -22,8 +22,8 @@ self.addEventListener("fetch", e => {
       if (res.ok) { const copy = res.clone(); caches.open(CACHE).then(c => c.put(req, copy)); }
       return res;
     }).catch(() => caches.match(req, { ignoreSearch: true }).then(r => r || caches.match("index.html"))));
-  } else {
-    // Tipografías de Google: primero la copia guardada
+  } else if (/fonts\.(googleapis|gstatic)\.com$/.test(new URL(req.url).hostname)) {
+    // Tipografías de Google: primero la copia guardada (el resto, como la API de GitHub, va directo a la red)
     e.respondWith(caches.match(req).then(hit => hit || fetch(req).then(res => {
       const copy = res.clone(); caches.open(CACHE).then(c => c.put(req, copy)); return res;
     })));

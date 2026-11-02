@@ -79,6 +79,9 @@ h2{font-family:var(--f-display);font-weight:700;font-size:22px;letter-spacing:.0
 .go{height:46px;padding:0 18px;border-radius:10px;border:0;background:var(--accent);color:var(--accent-ink);font:600 15px var(--f-body);cursor:pointer}
 .go.on{background:var(--done);color:#fff}
 .ilist{margin:0;padding-left:18px;font-size:15px}
+.foco{font-family:var(--f-display);font-weight:700;font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--chalk)}
+.ilist .d{font-family:var(--f-num);font-size:13px;color:var(--muted)}
+.block.fuerza .bhead h3{color:var(--accent)}
 .more{font-size:14px}
 .more summary{cursor:pointer;color:var(--accent);font-weight:600;list-style:none}
 .more summary::-webkit-details-marker{display:none}
@@ -131,6 +134,26 @@ h2{font-family:var(--f-display);font-weight:700;font-size:22px;letter-spacing:.0
 .sheet{background:var(--surface);color:var(--ink);border-radius:16px;padding:24px 20px calc(20px + env(safe-area-inset-bottom,0px));max-width:520px;width:100%;display:flex;flex-direction:column;gap:12px}
 .sheet h2{color:var(--done)}
 .sheet .go{width:100%}
+.sheet{max-height:calc(100vh - 32px);overflow:auto}
+
+/* modo profe */
+.profe{margin-top:16px;padding:12px 14px;border-radius:12px;border:1.5px solid var(--chalk);display:flex;flex-direction:column;gap:8px}
+.profe .row{flex-wrap:wrap;justify-content:flex-start}
+.exh .row{flex-wrap:nowrap;gap:8px;align-items:flex-start}
+.edit{flex:none;width:36px;height:36px;border-radius:50%;border:1.5px solid var(--line);background:var(--surface);color:var(--accent);font-size:16px;cursor:pointer}
+.add{width:100%;margin-top:10px;height:44px;border-radius:10px;border:1.5px dashed var(--line);background:none;color:var(--muted);font:600 15px var(--f-body);cursor:pointer}
+.form{display:flex;flex-direction:column;gap:12px}
+.form label{display:flex;flex-direction:column;gap:4px;font-size:13px;font-weight:600;color:var(--muted)}
+.form input,.form select{height:44px;padding:0 10px;border-radius:8px;border:1.5px solid var(--line);background:var(--bg);color:var(--ink);font:500 16px var(--f-body);width:100%;min-width:0}
+.form .two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.form .crow{display:grid;grid-template-columns:1fr 92px 64px 36px;gap:6px;align-items:end}
+.form .crow input,.form .crow select{height:40px}
+.form .acts{display:flex;gap:8px;flex-wrap:wrap}
+.form .acts .btn{flex:1}
+.issues{margin:0;padding-left:18px;font-size:14px;max-height:40vh;overflow:auto}
+.issues li{margin-bottom:4px}
+.ok-msg{color:var(--done);font-weight:600}
+.err-msg{color:#B3402F;font-weight:600}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
@@ -140,8 +163,10 @@ h2{font-family:var(--f-display);font-weight:700;font-size:22px;letter-spacing:.0
 <div class="modal" id="modal" hidden></div>
 
 <script src="rutina.js"></script>
+<script src="catalogo.js"></script>
+<script src="reglas.js"></script>
 <script>
-const R = window.RUTINA;
+let R = window.RUTINA;
 const $ = id => document.getElementById(id);
 const esc = s => String(s ?? "").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const mmss = s => { s=Math.max(0,Math.round(s)); return `${Math.floor(s/60)}:${String(s%60).padStart(2,"0")}`; };
@@ -153,6 +178,20 @@ const store = {
   get(k,def){ try{ const v=localStorage.getItem(k); return v?JSON.parse(v):def; }catch{ return def; } },
   set(k,v){ try{ localStorage.setItem(k,JSON.stringify(v)); }catch{} }
 };
+/* ---------- modo profe: borrador local que se publica en GitHub ---------- */
+const GH = {owner:"ezevillGH", repo:"calistenia-en-la-rivera", path:"rutina.js", branch:"main"};
+const CAT = window.CATALOGO || {};
+const hash = s => { let h=0; for(let i=0;i<s.length;i++) h=(h*31+s.charCodeAt(i))|0; return h; };
+let BASE = hash(JSON.stringify(window.RUTINA));
+const bKey = () => `bl:borrador:${window.RUTINA.id}`;
+let profe = !!store.get("bl:gh", null);
+let borrador = profe ? store.get(bKey(), null) : null;   // {base, R}
+if (borrador) R = borrador.R;
+const hayCambios = () => !!borrador && JSON.stringify(borrador.R) !== JSON.stringify(window.RUTINA);
+function editar(fn){   // aplica un cambio al borrador
+  if(!borrador) borrador = {base:BASE, R:JSON.parse(JSON.stringify(window.RUTINA))};
+  fn(borrador.R); R = borrador.R; store.set(bKey(), borrador); render();
+}
 /* ---------- nivel: cada uno ve solo su rutina ---------- */
 const NIVELES = R.niveles || [];
 let nivel = store.get("bl:nivel", null);
@@ -160,14 +199,19 @@ const nivelOk = () => !NIVELES.length || NIVELES.some(n=>n.id===nivel);
 const nivelNombre = () => NIVELES.find(n=>n.id===nivel)?.nombre || "";
 const delNivel = x => !x.nivel || x.nivel===nivel;
 // Sesiones del nivel elegido, con solo sus bloques
-function SES(){ return R.sesiones.filter(delNivel).map(s=>({...s, bloques:s.bloques.filter(delNivel)})); }
+// _si/_bi: posición en R, para que el modo profe edite el original
+function SES(){ return R.sesiones.map((s,si)=>({...s,_si:si})).filter(delNivel).map(s=>({...s, bloques:s.bloques.map((b,bi)=>({...b,_bi:bi})).filter(delNivel)})); }
+const focoDe = s => s.foco && typeof s.foco==="object" ? s.foco[nivel] : s.foco;
 const key = sid => `bl:${R.id}:${nivel||"x"}:${sid}`;
 const loadS = sid => store.get(key(sid), {done:{},rounds:{},startedAt:null,mainAt:null,endAt:null});
 const saveS = (sid,st) => store.set(key(sid),st);
 
 /* ---------- modelo ---------- */
 const isInterval = it => ["tabata","emom","amrap"].includes(it.tipo);
-const nSets = it => isInterval(it) ? 1 : (it.series||1);
+const isCirc = it => it.tipo==="circuito";
+const emomTxt = it => (it.cada||1)>1 ? `E${it.cada}MOM` : "EMOM";
+const nSets = it => isInterval(it) ? 1 : isCirc(it) ? it.vueltas : (it.series||1);
+const circDose = e => e.reps==null ? secTxt(e.seg) : /^\d+([–-]\d+)?$/.test(e.reps) ? `${e.reps} rep.` : String(e.reps);
 function itemDone(st,bi,ii,it){ for(let s=0;s<nSets(it);s++) if(!st.done[`${bi}-${ii}-${s}`]) return false; return true; }
 function blockDone(st,ses,pred){ return ses.bloques.every((b,bi)=>!pred(b) || b.items.every((it,ii)=>itemDone(st,bi,ii,it))); }
 function progress(ses,st){ let t=0,d=0; ses.bloques.forEach((b,bi)=>b.items.forEach((it,ii)=>{ for(let s=0;s<nSets(it);s++){ t++; if(st.done[`${bi}-${ii}-${s}`]) d++; } })); return {t,d}; }
@@ -176,8 +220,9 @@ function dose(it){
     case "reps": return `${it.series} × ${it.reps}${it.descanso?` · desc ${secTxt(it.descanso)}`:""}`;
     case "tiempo": return `${it.series} × ${secTxt(it.seg)}${it.descanso&&it.series>1?` · desc ${secTxt(it.descanso)}`:""}`;
     case "tabata": return `${it.rondas} × ${it.trabajo}"/${it.pausa}" · ${mmss(it.rondas*(it.trabajo+it.pausa))}`;
-    case "emom": return `${it.minutos}' · cada minuto`;
+    case "emom": return `${emomTxt(it)} ${it.minutos}' · ${(it.cada||1)>1?`cada ${it.cada}'`:"cada minuto"}`;
     case "amrap": return `${it.minutos}' · máx. rondas`;
+    case "circuito": return `${it.vueltas} vueltas${it.descanso?` · desc ${secTxt(it.descanso)}`:""}`;
   }
   return "";
 }
@@ -214,48 +259,54 @@ function renderHome(){
       ${R.descarga?`<span class="muted">Semana liviana: menos volumen para que el cuerpo asimile. Es parte del plan.</span>`:""}</div>
     <div class="list">${sesiones.map(s=>{ const st=loadS(s.id), p=progress(s,st);
       return `<button class="scard ${st.endAt?"done":""}" data-open="${esc(s.id)}">
-        <span class="t">${esc(s.nombre)}</span><span class="muted">${esc(s.sub||"")}</span>
+        <span class="t">${esc(s.nombre)}</span>${focoDe(s)?`<span class="foco">${esc(focoDe(s))}</span>`:""}<span class="muted">${esc(s.sub||"")}</span>
         <span class="bar"><i style="width:${p.t?Math.round(100*p.d/p.t):0}%"></i></span>
         <span class="row"><span class="status ${st.endAt?"ok":""}">${st.endAt?`✓ Completada el ${fecha(st.endAt)}`:p.d?`En curso · ${p.d}/${p.t} series`:"Sin empezar"}</span><span class="label">Abrir →</span></span>
       </button>`; }).join("")}</div>
     <div class="stats">
       <div class="stat"><span class="label">Esta semana</span><b>${doneThisWeek}/${sesiones.length}</b></div>
       <div class="stat"><span class="label">Sesiones en total</span><b>${hist.length}</b></div>
-    </div>`;
+    </div>
+    ${profeBar()}
+    <div class="reset">${profe?"":`<button class="link" data-profe-in>Modo profe</button>`}</div>`;
   window.scrollTo(0,0);
 }
 function exHTML(st,bi,ii,it){
   const k=`${bi}-${ii}`, complete=itemDone(st,bi,ii,it);
   let ctl="";
   if(isInterval(it)){
-    const on=st.done[`${k}-0`], word={tabata:"tabata",emom:"EMOM",amrap:"AMRAP"}[it.tipo];
+    const on=st.done[`${k}-0`], word={tabata:"tabata",emom:emomTxt(it),amrap:"AMRAP"}[it.tipo];
     ctl = `<ul class="ilist">${it.ejercicios.map(e=>`<li>${esc(e)}</li>`).join("")}</ul>
       <div class="sets"><button class="go ${on?"on":""}" data-int="${k}">${on?"✓ Hecho · repetir":`▶ Iniciar ${word}`}</button>
       ${on?"":`<button class="set" data-set="${k}-0" aria-label="Marcar como hecho">✓</button>`}</div>
       ${it.tipo==="amrap"&&st.rounds[k]!=null?`<span class="rounds">${st.rounds[k]} rondas completas</span>`:""}`;
   } else {
-    const timed = it.tipo==="tiempo";
-    ctl = `<div class="sets">${Array.from({length:it.series},(_,s)=>{ const on=st.done[`${k}-${s}`];
-      return `<button class="set ${on?"on":""} ${timed?"timed":""}" data-set="${k}-${s}" aria-pressed="${!!on}" aria-label="Serie ${s+1}">${on?"✓":s+1}</button>`; }).join("")}</div>`;
+    const timed = it.tipo==="tiempo" || isCirc(it), word = isCirc(it) ? "Vuelta" : "Serie";
+    ctl = `${isCirc(it)?`<ul class="ilist">${it.ejercicios.map(e=>`<li>${esc(e.nombre)} <span class="d">${esc(circDose(e))}</span></li>`).join("")}</ul>`:""}
+      <div class="sets">${Array.from({length:nSets(it)},(_,s)=>{ const on=st.done[`${k}-${s}`];
+      return `<button class="set ${on?"on":""} ${timed?"timed":""}" data-set="${k}-${s}" aria-pressed="${!!on}" aria-label="${word} ${s+1}">${on?"✓":s+1}</button>`; }).join("")}</div>`;
   }
   const extra = (it.claves?.length||it.facil||it.dificil||it.video) ? `<details class="more" data-more="${k}" ${openMore.has(k)?"open":""}><summary>Cómo se hace</summary>
       ${it.claves?.length?`<ul>${it.claves.map(c=>`<li>${esc(c)}</li>`).join("")}</ul>`:""}
       ${it.facil?`<p><b>Más fácil:</b> ${esc(it.facil)}</p>`:""}${it.dificil?`<p><b>Más difícil:</b> ${esc(it.dificil)}</p>`:""}
       ${/^https:\/\/youtu\.be\//.test(it.video||"")?`<p><a class="vid" href="${esc(it.video)}" target="_blank" rel="noopener">▶ Ver video</a></p>`:""}</details>` : "";
-  return `<div class="ex ${complete?"complete":""}"><div class="exh"><span class="n">${esc(it.nombre)}</span><span class="dose">${esc(dose(it))}</span></div>${ctl}${extra}</div>`;
+  const ed = profe ? `<button class="edit" data-edit="${k}" aria-label="Editar ${esc(it.nombre)}">✎</button>` : "";
+  return `<div class="ex ${complete?"complete":""}"><div class="exh"><span class="n">${esc(it.nombre)}</span><span class="row"><span class="dose">${esc(dose(it))}</span>${ed}</span></div>${ctl}${extra}</div>`;
 }
 function renderSession(ses){
   const st=loadS(ses.id), p=progress(ses,st);
   const mainDone = blockDone(st,ses,b=>b.tipo!=="calma");
   $("app").innerHTML = `
     <button class="back" data-home>← Semana</button>
-    <div class="shead"><div class="row"><span class="label">${esc(R.semana)}</span>${vozBtn()}</div><h2>${esc(ses.nombre)}</h2><span class="muted">${esc(ses.sub||"")}</span>
+    <div class="shead"><div class="row"><span class="label">${esc(R.semana)}</span>${vozBtn()}</div><h2>${esc(ses.nombre)}</h2>${focoDe(ses)?`<span class="foco">${esc(focoDe(ses))}</span>`:""}<span class="muted">${esc(ses.sub||"")}</span>
       <span class="bar"><i style="width:${p.t?Math.round(100*p.d/p.t):0}%"></i></span></div>
+    ${profeBar()}
     ${ses.bloques.map((b,bi)=>`
       ${b.tipo==="calma"&&mainDone?`<div class="banner"><b>Entrenamiento concluido</b><span>${st.endAt?"Sesión terminada. Buen trabajo.":"Ahora, la vuelta a la calma."}</span></div>`:""}
-      <section class="block ${b.tipo}" id="b${bi}"><div class="bhead"><h3>${esc(b.nombre)}</h3><span class="label">${{entrada:"Entrada en calor",principal:"Principal",calma:"Calma"}[b.tipo]||""}</span></div>
+      <section class="block ${b.tipo}" id="b${bi}"><div class="bhead"><h3>${esc(b.nombre)}</h3><span class="label">${{entrada:"Entrada en calor",principal:"Rutina",fuerza:"Fuerza",cierre:"Cierre",calma:"Calma"}[b.tipo]||""}</span></div>
       ${b.items.every((it,ii)=>itemDone(st,bi,ii,it))?"":`<button class="play" data-block="${bi}">▶ Reproducir bloque<small>${voz==="apagada"?"corre solo":"corre solo, con voz"}</small></button>`}
-      ${b.items.map((it,ii)=>exHTML(st,bi,ii,it)).join("")}</section>`).join("")}
+      ${b.items.map((it,ii)=>exHTML(st,bi,ii,it)).join("")}
+      ${profe&&b.tipo!=="cierre"?`<button class="add" data-add="${bi}">+ Agregar ${b.tipo==="entrada"?"ejercicio o circuito":"ejercicio"}</button>`:""}</section>`).join("")}
     <div class="reset">${confirmReset
       ?`<span class="muted">¿Borrar lo marcado en esta sesión?</span><button class="btn warn" data-reset-yes>Sí, reiniciar</button><button class="btn" data-reset-no>Cancelar</button>`
       :`<button class="link" data-reset>Reiniciar sesión</button>`}</div>`;
@@ -301,7 +352,7 @@ document.addEventListener("click",e=>{
   const sb=t.closest("[data-set]");
   if(sb){ const k=sb.dataset.set, [bi,ii,s]=k.split("-").map(Number), it=ses.bloques[bi].items[ii], st=loadS(ses.id);
     if(st.done[k]){ mark(ses,k,false); return; }
-    if(it.tipo==="tiempo") return runItem(ses,bi,ii,s);
+    if(it.tipo==="tiempo" || isCirc(it)) return runItem(ses,bi,ii,s);
     mark(ses,k,true);
     const next=pendingSets(loadS(ses.id),bi,ii,it)[0];
     if(it.tipo==="reps" && it.descanso && next!=null) runRest(ses,bi,ii,next);
@@ -324,6 +375,169 @@ document.addEventListener("click",e=>{
 document.addEventListener("toggle",e=>{ const d=e.target; if(d.dataset?.more){ d.open?openMore.add(d.dataset.more):openMore.delete(d.dataset.more); } },true);
 window.addEventListener("hashchange",()=>{ confirmReset=false; render(); window.scrollTo(0,0); keepAwake(); });
 
+/* ---------- modo profe: editor ---------- */
+const PARTES = {movilidad:"Movilidad",temperatura:"Temperatura",core:"Core",escapulas:"Escápulas",empuje:"Empuje",traccion:"Tracción",piernas:"Piernas",skill:"Skills",estiramiento:"Estiramientos",respiracion:"Respiración"};
+const letra = () => window.REGLAS?.LETRA[nivel] || "";
+function revisar(){ return window.REGLAS && CAT && Object.keys(CAT).length ? REGLAS.validar(R, CAT) : null; }
+function profeBar(){
+  if(!profe) return "";
+  const v = hayCambios() ? revisar() : null, n = v ? v.errores.length+v.avisos.length : 0;
+  return `<div class="profe"><span class="label">Modo profe</span>
+    <span>${hayCambios()?`Tenés cambios sin publicar${n?` · <b>${n} aviso${n>1?"s":""} de reglas</b>`:" · cumple las reglas"}.`:"Tocá ✎ en un ejercicio para editarlo. Los cambios quedan en borrador hasta que publiques."}</span>
+    ${borrador && borrador.base!==BASE?`<span class="err-msg">La rutina publicada cambió desde que empezaste este borrador. Si publicás, la pisás.</span>`:""}
+    <span class="row">${hayCambios()?`<button class="go" data-pf="revisar">Revisar y publicar</button><button class="btn" data-pf="descartar">Descartar</button>`:""}
+      <button class="link" data-pf="salir">Salir del modo profe</button></span></div>`;
+}
+// opciones del catálogo agrupadas por parte; solo lo permitido para el nivel elegido (más el actual)
+function opcionesEj(sel){
+  const L=letra(), grupos={};
+  Object.entries(CAT).forEach(([id,c])=>{ if(id===sel || !L || c.niv.includes(L)) (grupos[c.parte] ||= []).push([id,c]); });
+  if(sel && !CAT[sel]) (grupos["?"] ||= []).push([sel,{n:sel}]);
+  return Object.keys(PARTES).concat("?").filter(p=>grupos[p]).map(p=>`<optgroup label="${esc(PARTES[p]||"Otro")}">${grupos[p].map(([id,c])=>`<option value="${esc(id)}" ${id===sel?"selected":""}>${esc(c.n)}</option>`).join("")}</optgroup>`).join("");
+}
+const num = (name,label,val,extra="") => `<label>${label}<input name="${name}" type="number" inputmode="numeric" min="0" value="${val??""}" ${extra}></label>`;
+let ED=null;   // {si,bi,ii (null = nuevo), it}
+function abrirEditor(si,bi,ii,it){
+  ED={si,bi,ii,it:JSON.parse(JSON.stringify(it))}; dibujarEditor();
+}
+function dibujarEditor(){
+  const it=ED.it, nuevo=ED.ii==null, b=R.sesiones[ED.si].bloques[ED.bi];
+  let f="";
+  if(it.tipo==="reps" || it.tipo==="tiempo"){
+    f = `<label>Ejercicio<select name="ej">${opcionesEj(it.ej)}</select></label>
+      <label>Se mide por<select name="tipo"><option value="reps" ${it.tipo==="reps"?"selected":""}>Repeticiones</option><option value="tiempo" ${it.tipo==="tiempo"?"selected":""}>Tiempo</option></select></label>
+      <div class="two">${num("series","Series",it.series,'min="1"')}
+      ${it.tipo==="reps"?`<label>Repes<input name="reps" value="${esc(it.reps??"")}" placeholder="6–8"></label>`:num("seg","Segundos",it.seg,'min="1"')}</div>
+      <div class="two">${num("descanso","Descanso (s)",it.descanso)}
+      ${it.tipo==="reps"?num("segAuto","Timer (s, opcional)",it.seg):"<span></span>"}</div>`;
+  } else if(it.tipo==="circuito"){
+    f = `<label>Nombre<input name="nombre" value="${esc(it.nombre)}"></label>
+      <div class="two">${num("vueltas","Vueltas",it.vueltas,'min="1"')}${num("descanso","Descanso entre vueltas (s)",it.descanso)}</div>
+      ${it.ejercicios.map((e,j)=>`<div class="crow" data-row="${j}"><label>Ejercicio ${j+1}<select name="cej">${opcionesEj(e.ej)}</select></label>
+        <label>Mide<select name="cmodo"><option value="reps" ${e.reps!=null?"selected":""}>Repes</option><option value="seg" ${e.reps==null?"selected":""}>Seg</option></select></label>
+        <label>Cant.<input name="cval" value="${esc(e.reps??e.seg??"")}"></label>
+        <button class="edit" data-ed="quitar-ej" data-j="${j}" aria-label="Quitar ejercicio">×</button></div>`).join("")}
+      <button class="btn" data-ed="sumar-ej">+ Ejercicio al circuito</button>`;
+  } else {
+    f = `<label>Nombre<input name="nombre" value="${esc(it.nombre)}"></label>
+      ${it.tipo==="tabata"?`<div class="two">${num("rondas","Rondas",it.rondas,'min="1"')}${num("trabajo","Trabajo (s)",it.trabajo,'min="1"')}</div>${num("pausa","Pausa (s)",it.pausa)}`
+        : it.tipo==="emom" ? `<div class="two">${num("minutos","Minutos en total",it.minutos,'min="1"')}${num("cada","Cada (min)",it.cada||1,'min="1"')}</div>`
+        : num("minutos","Minutos",it.minutos,'min="1"')}
+      <span class="muted">Ejercicios: ${esc(it.ejercicios.join(", "))}. Para cambiarlos, avisale a Claude.</span>`;
+  }
+  $("modal").innerHTML = `<div class="sheet" role="dialog" aria-modal="true"><span class="label">${esc(b.nombre)}</span>
+    <h2 style="color:var(--ink)">${nuevo?"Agregar":"Editar"}</h2>
+    <form class="form" id="edform" onsubmit="return false">${f}
+      <div class="acts">${nuevo?"":`<button class="btn" data-ed="subir">↑ Subir</button><button class="btn" data-ed="bajar">↓ Bajar</button><button class="btn warn" data-ed="quitar">Quitar</button>`}</div>
+      <button class="go" data-ed="guardar">Guardar en el borrador</button><button class="btn" data-ed="cancelar">Cancelar</button></form></div>`;
+  $("modal").hidden=false;
+}
+// lee el formulario y actualiza ED.it
+function leerEditor(){
+  const F=$("edform"), g=n=>F.elements[n]?.value, it=ED.it, nOr=(v,d)=>v===""||v==null?d:Number(v);
+  if(it.tipo==="reps" || it.tipo==="tiempo"){
+    const ej=g("ej"), c=CAT[ej];
+    if(ej!==it.ej){ it.ej=ej; it.nombre=c?.n||ej; if(c?.claves) it.claves=c.claves; else delete it.claves; if(c?.video) it.video="https://youtu.be/"+c.video; else delete it.video; }
+    it.series=nOr(g("series"),1); it.descanso=nOr(g("descanso"),undefined);
+    const tipo=g("tipo");
+    if(tipo!==it.tipo){ it.tipo=tipo; if(tipo==="tiempo"){ it.seg=it.seg||20; delete it.reps; } else { it.reps=it.reps||"6–8"; delete it.seg; } return; }
+    if(tipo==="reps"){ it.reps=g("reps")||"6–8"; it.seg=nOr(g("segAuto"),undefined); } else it.seg=nOr(g("seg"),20);
+  } else if(it.tipo==="circuito"){
+    it.nombre=g("nombre")||it.nombre; it.vueltas=nOr(g("vueltas"),2); it.descanso=nOr(g("descanso"),undefined);
+    [...F.querySelectorAll("[data-row]")].forEach((row,j)=>{ const e=it.ejercicios[j], q=n=>row.querySelector(`[name=${n}]`).value;
+      e.ej=q("cej"); e.nombre=CAT[e.ej]?.n||e.ej;
+      if(q("cmodo")==="reps"){ e.reps=q("cval")||"5"; if(e.seg==null) e.seg=15; } else { delete e.reps; e.seg=Number(q("cval"))||15; } });
+  } else {
+    it.nombre=g("nombre")||it.nombre;
+    if(it.tipo==="tabata"){ it.rondas=nOr(g("rondas"),8); it.trabajo=nOr(g("trabajo"),20); it.pausa=nOr(g("pausa"),10); } else { it.minutos=nOr(g("minutos"),10); if(it.tipo==="emom"){ const c=nOr(g("cada"),1); if(c>1) it.cada=c; else delete it.cada; } }
+  }
+  Object.keys(it).forEach(k=>it[k]===undefined && delete it[k]);
+}
+function nuevoItem(b){
+  const parte = {entrada:"core",principal:"empuje",fuerza:"empuje",calma:"estiramiento"}[b.tipo];
+  const id = Object.keys(CAT).find(i=>CAT[i].parte===parte && (!letra()||CAT[i].niv.includes(letra()))) || Object.keys(CAT)[0];
+  if(b.tipo==="calma") return {tipo:"tiempo",ej:id,nombre:CAT[id]?.n||id,series:1,seg:30};
+  if(b.tipo==="entrada") return {tipo:"circuito",nombre:"Circuito",vueltas:2,descanso:20,ejercicios:[0,1,2].map(()=>({ej:id,nombre:CAT[id]?.n||id,reps:"5",seg:15}))};
+  return {tipo:"reps",ej:id,nombre:CAT[id]?.n||id,series:3,reps:b.tipo==="fuerza"?"Casi al fallo (dejá 1–2)":"6–8",descanso:90,...(CAT[id]?.claves?{claves:CAT[id].claves}:{})};
+}
+document.addEventListener("click",e=>{
+  const t=e.target;
+  if(t.closest("[data-profe-in]")) return pedirClave();
+  const pf=t.closest("[data-pf]")?.dataset.pf;
+  if(pf==="salir"){ if(hayCambios() && !confirm("Tenés cambios sin publicar. ¿Salir y descartarlos?")) return;
+    store.set("bl:gh",null); try{ localStorage.removeItem("bl:gh"); localStorage.removeItem(bKey()); }catch{} profe=false; borrador=null; R=window.RUTINA; render(); return; }
+  if(pf==="descartar"){ if(!confirm("¿Descartar todos los cambios del borrador?")) return; try{ localStorage.removeItem(bKey()); }catch{} borrador=null; R=window.RUTINA; render(); return; }
+  if(pf==="revisar") return mostrarRevision();
+  if(pf==="publicar") return publicar(t.closest("[data-pf]"));
+  if(pf==="guardar-clave") return guardarClave();
+  if(pf==="cerrar"){ $("modal").hidden=true; return; }
+  const ed=t.closest("[data-edit]");
+  if(ed){ const ses=currentSes(), [bi,ii]=ed.dataset.edit.split("-").map(Number), b=ses.bloques[bi]; abrirEditor(ses._si,b._bi,ii,b.items[ii]); return; }
+  const ad=t.closest("[data-add]");
+  if(ad){ const ses=currentSes(), b=ses.bloques[Number(ad.dataset.add)]; abrirEditor(ses._si,b._bi,null,nuevoItem(b)); return; }
+  const a=t.closest("[data-ed]")?.dataset.ed; if(!a || !ED) return;
+  if(a==="cancelar"){ ED=null; $("modal").hidden=true; return; }
+  leerEditor();
+  if(a==="sumar-ej"){ const u=ED.it.ejercicios.at(-1); ED.it.ejercicios.push({...u}); return dibujarEditor(); }
+  if(a==="quitar-ej"){ ED.it.ejercicios.splice(Number(t.closest("[data-j]").dataset.j),1); return dibujarEditor(); }
+  const {si,bi,ii,it}=ED; ED=null; $("modal").hidden=true;
+  editar(R2=>{ const items=R2.sesiones[si].bloques[bi].items;
+    if(a==="guardar"){ if(ii==null) items.push(it); else items[ii]=it; }
+    if(a==="quitar") items.splice(ii,1);
+    if(a==="subir" && ii>0) [items[ii-1],items[ii]]=[items[ii],items[ii-1]];
+    if(a==="bajar" && ii<items.length-1) [items[ii+1],items[ii]]=[items[ii],items[ii+1]];
+  });
+});
+// cambiar "Se mide por" redibuja el formulario
+document.addEventListener("change",e=>{ if(ED && e.target.name==="tipo"){ leerEditor(); dibujarEditor(); } });
+function pedirClave(){
+  $("modal").innerHTML = `<div class="sheet" role="dialog" aria-modal="true"><span class="label">Solo para el profe</span><h2 style="color:var(--ink)">Modo profe</h2>
+    <span class="muted">Para editar la rutina y publicarla para todos hace falta tu clave de GitHub (un token con permiso solo sobre este repositorio). Queda guardada únicamente en este celular.</span>
+    <form class="form" onsubmit="return false"><label>Token de GitHub<input id="ghtok" type="password" autocomplete="off" spellcheck="false"></label>
+      <span id="ghmsg"></span><button class="go" data-pf="guardar-clave">Entrar</button><button class="btn" data-pf="cerrar">Cancelar</button></form></div>`;
+  $("modal").hidden=false;
+}
+const ghHead = tok => ({Authorization:`Bearer ${tok}`, Accept:"application/vnd.github+json"});
+async function guardarClave(){
+  const tok=$("ghtok").value.trim(), msg=$("ghmsg"); if(!tok) return;
+  msg.className="muted"; msg.textContent="Verificando…";
+  try{ const r=await fetch(`https://api.github.com/repos/${GH.owner}/${GH.repo}`,{headers:ghHead(tok)}); const j=await r.json();
+    if(!r.ok || !j.permissions?.push){ msg.className="err-msg"; msg.textContent= r.ok ? "Ese token no tiene permiso de escritura en el repositorio." : "Token inválido o vencido."; return; }
+    store.set("bl:gh",tok); profe=true; borrador=store.get(bKey(),null); if(borrador) R=borrador.R; $("modal").hidden=true; render();
+  }catch{ msg.className="err-msg"; msg.textContent="Sin conexión con GitHub. Probá de nuevo."; }
+}
+function mostrarRevision(){
+  const v=revisar();
+  const lista = v ? [...v.errores,...v.avisos] : null;
+  $("modal").innerHTML = `<div class="sheet" role="dialog" aria-modal="true"><span class="label">${esc(R.semana)}</span><h2 style="color:var(--ink)">Publicar cambios</h2>
+    ${lista==null?`<span class="muted">No se pudieron cargar las reglas para revisar.</span>`
+      : lista.length?`<span><b>${lista.length} aviso${lista.length>1?"s":""} de reglas</b> (podés publicar igual):</span><ul class="issues">${lista.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>`
+      : `<span class="ok-msg">✓ Cumple todas las reglas.</span>`}
+    <span class="muted">Al publicar, todo el grupo ve la rutina nueva en 1–2 minutos.</span>
+    <span id="pubmsg"></span>
+    <button class="go" data-pf="publicar">${lista?.length?"Publicar igual":"Publicar"}</button><button class="btn" data-pf="cerrar">Volver</button></div>`;
+  $("modal").hidden=false;
+}
+async function publicar(btn){
+  const tok=store.get("bl:gh",null), msg=$("pubmsg"); if(!tok) return;
+  btn.disabled=true; msg.className="muted"; msg.textContent="Publicando…";
+  const api=`https://api.github.com/repos/${GH.owner}/${GH.repo}/contents/${GH.path}`;
+  try{
+    const cur=await fetch(`${api}?ref=${GH.branch}&t=${Date.now()}`,{headers:ghHead(tok),cache:"no-store"});
+    if(!cur.ok) throw new Error(cur.status===401?"El token venció o es inválido. Salí del modo profe y volvé a entrar.":"No pude leer la rutina publicada.");
+    const {sha}=await cur.json();
+    const d=new Date(), txt=`/* Ajustada desde el modo profe el ${d.getDate()}/${d.getMonth()+1} a las ${d.getHours()}:${String(d.getMinutes()).padStart(2,"0")}. */\nwindow.RUTINA = ${JSON.stringify(R,null,1)};\n`;
+    const by=new TextEncoder().encode(txt); let bin=""; for(let i=0;i<by.length;i+=8192) bin+=String.fromCharCode(...by.subarray(i,i+8192));
+    const content=btoa(bin);
+    const r=await fetch(api,{method:"PUT",headers:{...ghHead(tok),"Content-Type":"application/json"},
+      body:JSON.stringify({message:`Ajuste de rutina desde el modo profe (${R.semana})`,content,sha,branch:GH.branch})});
+    if(!r.ok) throw new Error(r.status===409?"Alguien publicó otra versión recién. Recargá la app y probá de nuevo.":`GitHub respondió ${r.status}.`);
+    window.RUTINA=JSON.parse(JSON.stringify(R)); BASE=hash(JSON.stringify(window.RUTINA)); try{ localStorage.removeItem(bKey()); }catch{} borrador=null;
+    msg.className="ok-msg"; msg.textContent="✓ Publicado. En 1–2 minutos lo ve todo el grupo.";
+    btn.outerHTML=`<button class="go" data-pf="cerrar">Listo</button>`; render();
+  }catch(err){ btn.disabled=false; msg.className="err-msg"; msg.textContent=err.message||"No se pudo publicar."; }
+}
+
 /* ---------- voz ---------- */
 const VOCES=["detallada","breve","apagada"];
 let voz=store.get("bl:voz","detallada"), voice=null;
@@ -342,8 +556,11 @@ const hablarReps = r => String(r).replace(/\s*[–-]\s*/g," a ").replace(/c\//g,
 const clavesTxt = it => it.claves?.length ? " " + it.claves.join(". ") + "." : "";
 function intro(it,s){
   if(it.tipo==="tabata") return `${it.nombre}: ${it.rondas} rondas de ${it.trabajo} segundos de trabajo y ${it.pausa} de pausa. ${it.ejercicios.join(" y ")}.`;
-  if(it.tipo==="emom") return `${it.nombre}: ${it.minutos} minutos. ${it.ejercicios.join(", después ")}.`;
+  if(it.tipo==="emom") return (it.cada||1)>1
+    ? `${it.nombre}: cada ${it.cada} minutos, durante ${it.minutos} minutos: ${it.ejercicios.join(", ")}. Lo que sobra del tiempo es descanso.`
+    : `${it.nombre}: ${it.minutos} minutos. ${it.ejercicios.join(", después ")}.`;
   if(it.tipo==="amrap") return `${it.nombre}: máximas rondas en ${it.minutos} minutos de ${it.ejercicios.join(", ")}.`;
+  if(isCirc(it)) return `${it.nombre}, vuelta ${s+1} de ${it.vueltas}: ${it.ejercicios.map(e=>`${e.reps!=null?hablarReps(e.reps):hablarSeg(e.seg)} de ${e.nombre.toLowerCase()}`).join(", ")}.`;
   const serie = it.series>1 ? `, serie ${s+1} de ${it.series}` : "";
   return `${it.nombre}${serie}: ${it.tipo==="tiempo"?hablarSeg(it.seg):hablarReps(it.reps)}.`;
 }
@@ -406,6 +623,7 @@ function drawTimer(){
       <div class="ph">${esc(p.label)}</div>
       <div class="clock ${manual?"up":""}">${mmss(manual?Math.floor(shown):Math.ceil(shown))}</div>
       ${p.info?`<div class="info">${esc(p.info)}</div>`:""}
+      ${p.circuit&&!p.amrap?`<ul class="circ">${p.circuit.map(c=>`<li>${esc(c)}</li>`).join("")}</ul>`:""}
       ${p.amrap?`<ul class="circ">${p.circuit.map(c=>`<li>${esc(c)}</li>`).join("")}</ul>
         <div class="amrap"><button data-t="minus" aria-label="Restar ronda">−</button><b>${T.rounds}</b><button data-t="plus" aria-label="Sumar ronda">+</button></div><div class="next">Rondas completas</div>`:""}
       ${nx?`<div class="next">Después: ${esc(nx.label)}${nx.secs!=null?` · ${secTxt(nx.secs)}`:""}</div>`:""}
@@ -436,7 +654,7 @@ function leadPhase(it,s,{first,blockName,secs}){
   if(first) return {label:"Preparate",secs,kind:"prep",info:`Primero: ${it.nombre}`,
     say:`${blockName?`Arrancamos con ${blockName}. `:""}Primero: ${nx}`, sayLong:`${blockName?`Arrancamos con ${blockName}. `:""}Primero: ${nx}${detail}`};
   const word = s>0 ? "Descanso" : "Cambio";
-  return {label:s>0?"Descanso":"Cambio de ejercicio",secs,kind:"rest",info:`Sigue: ${it.nombre}${!isInterval(it)&&it.series>1?` · serie ${s+1} de ${it.series}`:""}`,
+  return {label:s>0?"Descanso":"Cambio de ejercicio",secs,kind:"rest",info:`Sigue: ${it.nombre}${!isInterval(it)&&nSets(it)>1?` · ${isCirc(it)?"vuelta":"serie"} ${s+1} de ${nSets(it)}`:""}`,
     say:`${word}. Lo que sigue: ${nx}`, sayLong:`${word}. Lo que sigue: ${nx}${detail}`};
 }
 function workPhases(bi,ii,it,s){
@@ -444,11 +662,23 @@ function workPhases(bi,ii,it,s){
   if(it.tipo==="tiempo") return [{label:it.nombre,secs:it.seg,kind:"work",info:it.series>1?`Serie ${s+1} de ${it.series}`:"",say:"¡Vamos!",key}];
   if(it.tipo==="reps") return [{label:it.nombre,secs:it.seg||null,kind:"work",info:`${it.reps}${it.series>1?` · serie ${s+1} de ${it.series}`:""}`,
     say: it.seg ? "¡Vamos!" : "¡Vamos! Tocá Listo cuando termines.", key}];
+  if(isCirc(it)){ const ex=it.ejercicios, ph=[], pausa=it.pausa??5;
+    ex.forEach((e,j)=>{
+      if(j>0) ph.push({label:"Cambio",secs:pausa,kind:"rest",info:`Viene: ${e.nombre} · ${circDose(e)}`,say:`${e.nombre}.`});
+      const info=`${circDose(e)} · vuelta ${s+1} de ${it.vueltas}`;
+      ph.push(e.seg ? {label:e.nombre,secs:e.seg,kind:"work",info,say:j?"¡Vamos!":`${e.nombre}. ¡Vamos!`}
+                    : {label:e.nombre,secs:null,kind:"work",info,say:`${j?"":e.nombre+". "}Tocá Listo cuando termines.`}); });
+    ph[ph.length-1].key=key;
+    return ph; }
   const ex=it.ejercicios, ph=[], k0=`${bi}-${ii}-0`;
   if(it.tipo==="tabata") for(let r=0;r<it.rondas;r++){
     ph.push({label:ex[r%ex.length],secs:it.trabajo,kind:"work",info:`Ronda ${r+1} de ${it.rondas}`,say:`¡${ex[r%ex.length]}!`});
     if(r<it.rondas-1) ph.push({label:"Pausa",secs:it.pausa,kind:"rest",info:`Viene: ${ex[(r+1)%ex.length]}`,say:`Pausa. Viene ${ex[(r+1)%ex.length]}.`}); }
-  if(it.tipo==="emom") for(let m=0;m<it.minutos;m++) ph.push({label:ex[m%ex.length],secs:60,kind:"work",info:`Minuto ${m+1} de ${it.minutos}`,
+  const cada=it.cada||1;
+  if(it.tipo==="emom" && cada>1){ const n=Math.floor(it.minutos/cada);
+    for(let m=0;m<n;m++) ph.push({label:`Ronda ${m+1} de ${n}`,secs:cada*60,kind:"work",info:"Hacé la ronda; lo que sobra es descanso",circuit:ex,
+      say: m===n-1 ? `Última ronda. ${ex.join(", ")}.` : `Ronda ${m+1}. ${ex.join(", ")}.`}); }
+  else if(it.tipo==="emom") for(let m=0;m<it.minutos;m++) ph.push({label:ex[m%ex.length],secs:60,kind:"work",info:`Minuto ${m+1} de ${it.minutos}`,
     say: m===it.minutos-1 ? `Último minuto. ${ex[m%ex.length]}.` : `Minuto ${m+1}. ${ex[m%ex.length]}.`});
   if(it.tipo==="amrap") ph.push({label:"AMRAP",secs:it.minutos*60,kind:"work",info:"Máximas rondas con buena técnica",say:"¡Vamos! Sumá cada ronda completa.",amrap:true,circuit:ex});
   ph[ph.length-1].key=k0;
