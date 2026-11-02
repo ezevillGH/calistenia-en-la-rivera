@@ -1,4 +1,4 @@
-/* Generado por build.js desde prueba.js. Se puede ajustar desde el modo profe de la app. */
+/* Ajustada desde el modo profe el 1/11 a las 22:59. */
 window.RUTINA = {
  "id": "prueba",
  "semana": "Rutina de prueba",
@@ -48,7 +48,7 @@ window.RUTINA = {
        "tipo": "tiempo",
        "ej": "movilidad-articular",
        "series": 1,
-       "seg": 120,
+       "seg": 180,
        "nombre": "Movilidad articular de pies a cabeza",
        "claves": [
         "Tobillos, rodillas, cadera, tronco, hombros, codos, muñecas y cuello",
