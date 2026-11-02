@@ -531,7 +531,9 @@ async function publicar(btn){
     const content=btoa(bin);
     const r=await fetch(api,{method:"PUT",headers:{...ghHead(tok),"Content-Type":"application/json"},
       body:JSON.stringify({message:`Ajuste de rutina desde el modo profe (${R.semana})`,content,sha,branch:GH.branch})});
-    if(!r.ok) throw new Error(r.status===409?"Alguien publicó otra versión recién. Recargá la app y probá de nuevo.":`GitHub respondió ${r.status}.`);
+    if(!r.ok) throw new Error(r.status===409?"Alguien publicó otra versión recién. Recargá la app y probá de nuevo."
+      : r.status===403||r.status===404?"El token no tiene permiso para escribir. En GitHub, editá el token y en Repository permissions → Contents poné \"Read and write\"."
+      : `GitHub respondió ${r.status}.`);
     window.RUTINA=JSON.parse(JSON.stringify(R)); BASE=hash(JSON.stringify(window.RUTINA)); try{ localStorage.removeItem(bKey()); }catch{} borrador=null;
     msg.className="ok-msg"; msg.textContent="✓ Publicado. En 1–2 minutos lo ve todo el grupo.";
     btn.outerHTML=`<button class="go" data-pf="cerrar">Listo</button>`; render();
