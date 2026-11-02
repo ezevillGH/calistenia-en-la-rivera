@@ -77,6 +77,21 @@ button{font:inherit;color:inherit}
 .barra{display:flex;gap:8px;margin-top:10px;pointer-events:auto}
 .btn{flex:1;background:rgba(16,21,27,.85);border:1.5px solid rgba(255,255,255,.2);border-radius:12px;padding:12px 6px;font-weight:600;font-size:14px;cursor:pointer}
 .btn.salir{border-color:var(--bad);color:#ffb3ad}
+.btn.grabar{color:#ffb3ad}
+.btn.grabando{background:var(--bad);border-color:var(--bad);color:#fff;font-variant-numeric:tabular-nums}
+.rec{position:absolute;top:max(12px,env(safe-area-inset-top));left:50%;transform:translateX(-50%);background:var(--bad);color:#fff;font-weight:600;font-size:14px;padding:4px 10px;border-radius:999px;font-variant-numeric:tabular-nums;pointer-events:none}
+#revision{position:absolute;inset:0;background:rgba(8,11,14,.92);display:flex;align-items:center;justify-content:center;
+  padding-block:max(16px,env(safe-area-inset-top)) max(16px,env(safe-area-inset-bottom));
+  padding-left:max(16px,env(safe-area-inset-left));padding-right:max(16px,env(safe-area-inset-right))}
+.hoja{width:100%;max-width:640px;max-height:100%;display:flex;flex-direction:column;gap:12px;background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:14px}
+.hoja-tit{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.hoja-tit b{font-family:var(--display);font-weight:800;font-size:26px;text-transform:uppercase}
+.hoja-tit span{color:var(--muted);font-size:14px;font-variant-numeric:tabular-nums}
+#revVideo{width:100%;min-height:0;flex:1 1 auto;max-height:60vh;background:#000;border-radius:10px;object-fit:contain}
+.hoja-btns{display:flex;gap:8px}
+.accion{flex:1;text-align:center;text-decoration:none;background:var(--bg);border:1.5px solid var(--line);border-radius:12px;padding:14px 6px;font-weight:600;font-size:15px;color:var(--fg);cursor:pointer}
+.accion.principal{background:var(--chalk);border-color:var(--chalk);color:#1b1407}
+.accion.peligro{color:#ffb3ad;border-color:#5a2a27}
 #cargando{position:absolute;inset:0;display:grid;place-items:center;background:rgba(16,21,27,.9);text-align:center;padding:24px;font-size:17px;line-height:1.4}
 @media (prefers-reduced-motion:no-preference){.aviso{transition:background-color .15s}}
 /* Celu acostado: paneles compactos para no tapar el cuerpo */
@@ -169,6 +184,7 @@ button{font:inherit;color:inherit}
         <div id="avisos"></div>
       </div>
       <div class="barra">
+        <button class="btn grabar" id="bGrabar">● Grabar</button>
         <button class="btn" id="bReiniciar">Reiniciar</button>
         <button class="btn" id="bMute">Voz: sí</button>
         <button class="btn" id="bGirar">Girar cámara</button>
@@ -177,6 +193,18 @@ button{font:inherit;color:inherit}
     </div>
   </div>
   <div id="cargando">Cargando el detector de postura…</div>
+  <div id="revision" hidden role="dialog" aria-label="Video grabado">
+    <div class="hoja">
+      <div class="hoja-tit"><b>Tu video</b><span id="revInfo"></span></div>
+      <video id="revVideo" playsinline controls loop></video>
+      <div class="hoja-btns">
+        <button class="accion principal" id="bCompartir">Compartir</button>
+        <a class="accion" id="bGuardarVideo" href="#" download>Guardar</a>
+        <button class="accion peligro" id="bDescartar">Descartar</button>
+      </div>
+      <p class="nota" id="revNota"></p>
+    </div>
+  </div>
 </section>
 
 <script type="module">
@@ -526,6 +554,8 @@ $("empezar").addEventListener("click", async () => {
 });
 
 function salir() {
+  pararGrabacion(true);
+  if (enRevision) cerrarRevision();
   corriendo = false;
   if (stream) stream.getTracks().forEach((t) => t.stop());
   stream = null;
@@ -555,7 +585,7 @@ $("chips").addEventListener("click", (e) => {
 function ciclo() {
   if (!corriendo) return;
   requestAnimationFrame(ciclo);
-  if (!detector || video.readyState < 2 || video.currentTime === ultimoTiempoVideo) return;
+  if (enRevision || !detector || video.readyState < 2 || video.currentTime === ultimoTiempoVideo) return;
   ultimoTiempoVideo = video.currentTime;
   const ahora = performance.now();
   const w = video.videoWidth, h = video.videoHeight;
@@ -577,26 +607,190 @@ function ciclo() {
 
   fps = 0.9 * fps + 0.1 * (1000 / Math.max(ahora - tFps, 1)); tFps = ahora;
   dibujar(pts, vis, ej);
+  if (grabando()) componer(pts, vis, ej);
   pintarHud(ej, !!pts);
+}
+
+const COLORES = (() => {
+  const css = getComputedStyle(document.documentElement);
+  const g = (n) => css.getPropertyValue(n).trim();
+  return { bad: g("--bad"), ok: g("--ok"), chalk: g("--chalk"), bg: g("--bg") };
+})();
+
+function dibujarEsqueleto(c, pts, vis, ej, anchoRef) {
+  const color = ej.errores.length ? COLORES.bad : (ej.enPos ? COLORES.ok : COLORES.chalk);
+  const grosor = Math.max(4, anchoRef / 160);
+  c.lineWidth = grosor; c.lineCap = "round"; c.strokeStyle = color;
+  for (const [a, b] of CONEX) {
+    if (vis[a] < CFG.visMin || vis[b] < CFG.visMin) continue;
+    c.beginPath(); c.moveTo(pts[a].x, pts[a].y); c.lineTo(pts[b].x, pts[b].y); c.stroke();
+  }
+  c.fillStyle = "#ffffff";
+  for (const i of CUERPO) {
+    if (vis[i] < CFG.visMin) continue;
+    c.beginPath(); c.arc(pts[i].x, pts[i].y, grosor * 0.9, 0, Math.PI * 2); c.fill();
+  }
 }
 
 function dibujar(pts, vis, ej) {
   ctx.clearRect(0, 0, lienzo.width, lienzo.height);
-  if (!pts) return;
-  const css = getComputedStyle(document.documentElement);
-  const color = ej.errores.length ? css.getPropertyValue("--bad") : (ej.enPos ? css.getPropertyValue("--ok") : css.getPropertyValue("--chalk"));
-  const grosor = Math.max(4, lienzo.width / 160);
-  ctx.lineWidth = grosor; ctx.lineCap = "round"; ctx.strokeStyle = color.trim();
-  for (const [a, b] of CONEX) {
-    if (vis[a] < CFG.visMin || vis[b] < CFG.visMin) continue;
-    ctx.beginPath(); ctx.moveTo(pts[a].x, pts[a].y); ctx.lineTo(pts[b].x, pts[b].y); ctx.stroke();
-  }
-  ctx.fillStyle = "#ffffff";
-  for (const i of CUERPO) {
-    if (vis[i] < CFG.visMin) continue;
-    ctx.beginPath(); ctx.arc(pts[i].x, pts[i].y, grosor * 0.9, 0, Math.PI * 2); ctx.fill();
-  }
+  if (pts) dibujarEsqueleto(ctx, pts, vis, ej, lienzo.width);
 }
+
+// ---------------- Grabacion ----------------
+const Grab = { rec: null, partes: [], t0: 0, blob: null, url: null, tipo: "", timer: null, guardado: false, lienzo: document.createElement("canvas") };
+Grab.ctx = Grab.lienzo.getContext("2d");
+const MAX_GRAB_S = 180;
+let enRevision = false;
+
+function tipoSoportado() {
+  if (!window.MediaRecorder) return null;
+  const tipos = ["video/mp4;codecs=avc1.42E01E", "video/mp4;codecs=avc1", "video/mp4",
+                 "video/webm;codecs=vp9", "video/webm;codecs=vp8", "video/webm"];
+  for (const t of tipos) { try { if (MediaRecorder.isTypeSupported(t)) return t; } catch (e) {} }
+  return "";
+}
+const grabando = () => Grab.rec && Grab.rec.state === "recording";
+const mmss = (s) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, "0")}`;
+
+function rotuloGrabar() {
+  const b = $("bGrabar");
+  if (grabando()) {
+    const s = (performance.now() - Grab.t0) / 1000;
+    b.textContent = `■ Parar ${mmss(s)}`; b.classList.add("grabando");
+    if (s >= MAX_GRAB_S) pararGrabacion();
+  } else { b.textContent = "● Grabar"; b.classList.remove("grabando"); }
+}
+
+function empezarGrabacion() {
+  const tipo = tipoSoportado();
+  if (tipo === null || !Grab.lienzo.captureStream) {
+    $("avisos").innerHTML = `<div class="aviso neutro">Este navegador no permite grabar. Probá con Chrome o Safari actualizados.</div>`;
+    return;
+  }
+  const vw = video.videoWidth, vh = video.videoHeight;
+  const esc = Math.min(1, 1280 / Math.max(vw, vh));
+  Grab.lienzo.width = Math.round(vw * esc); Grab.lienzo.height = Math.round(vh * esc);
+  componer(null, null, EJERCICIOS[estado.ej]);
+  const flujo = Grab.lienzo.captureStream(30);
+  const opts = tipo ? { mimeType: tipo, videoBitsPerSecond: 4_000_000 } : { videoBitsPerSecond: 4_000_000 };
+  try { Grab.rec = new MediaRecorder(flujo, opts); }
+  catch (e) { Grab.rec = new MediaRecorder(flujo); }
+  Grab.tipo = Grab.rec.mimeType || tipo || "video/webm";
+  Grab.partes = [];
+  Grab.rec.ondataavailable = (e) => { if (e.data && e.data.size) Grab.partes.push(e.data); };
+  Grab.rec.onstop = () => { clearInterval(Grab.timer); rotuloGrabar(); if (Grab.descartarAlParar) { Grab.descartarAlParar = false; Grab.partes = []; return; } mostrarRevision(); };
+  Grab.rec.start(1000);
+  Grab.t0 = performance.now();
+  Grab.timer = setInterval(rotuloGrabar, 250);
+  rotuloGrabar();
+}
+function pararGrabacion(descartar = false) {
+  if (!Grab.rec || Grab.rec.state === "inactive") return;
+  Grab.descartarAlParar = descartar;
+  Grab.rec.stop();
+}
+$("bGrabar").addEventListener("click", () => (grabando() ? pararGrabacion() : empezarGrabacion()));
+
+// Cuadro del video grabado: camara + esqueleto + correcciones escritas
+function componer(pts, vis, ej) {
+  const c = Grab.ctx, W = Grab.lienzo.width, H = Grab.lienzo.height;
+  if (!W || !H) return;
+  const s = W / video.videoWidth;
+  c.save();
+  if (estado.cam === "user") { c.translate(W, 0); c.scale(-1, 1); }
+  c.drawImage(video, 0, 0, W, H);
+  if (pts) { c.scale(s, s); dibujarEsqueleto(c, pts, vis, ej, video.videoWidth); }
+  c.restore();
+
+  const u = Math.max(14, Math.min(W, H) / 22);   // unidad de texto
+  const BODY = "Barlow, sans-serif", DISP = '"Barlow Condensed", sans-serif';
+  const caja = (x, y, txt, peso, tam, familia, fondo, colorTxt) => {
+    const pad = u * 0.4;
+    c.font = `${peso} ${tam}px ${familia}`;
+    const ancho = c.measureText(txt).width, alto = tam * 1.15 + pad;
+    c.fillStyle = fondo; c.fillRect(x, y, ancho + pad * 2, alto);
+    c.fillStyle = colorTxt; c.textBaseline = "top"; c.fillText(txt, x + pad, y + pad * 0.55);
+    return alto;
+  };
+  const m = ej.metrica();
+  const margen = u * 0.6;
+  let y = margen;
+  y += caja(margen, y, `${ej.constructor.name.toUpperCase()} · ${m.lbl}`, 600, u * 0.8, BODY, "rgba(16,21,27,.78)", "#93a0ad");
+  caja(margen, y, m.num, 800, u * 2, DISP, "rgba(16,21,27,.78)", "#eef1ee");
+
+  let yb = H - margen;
+  const lineas = ej.errores.length ? ej.errores.map((e) => [e.toUpperCase(), COLORES.bad, "#ffffff"])
+                : ej.enPos && !(ej instanceof Libre) ? [["BIEN", COLORES.ok, "#06231a"]] : [];
+  if (performance.now() - Voz.tUltimo < 2000 && Voz.ultimo) lineas.push([`Voz: ${Voz.ultimo}`, "rgba(16,21,27,.85)", COLORES.chalk]);
+  for (const [txt, fondo, col] of lineas.reverse()) {
+    const alto = u * 1.25 * 1.15 + u * 0.4;
+    yb -= alto;
+    caja(margen, yb, txt, 800, u * 1.25, DISP, fondo, col);
+    yb -= u * 0.25;
+  }
+  c.font = `500 ${u * 0.65}px Barlow, sans-serif`;
+  c.fillStyle = "rgba(255,255,255,.7)"; c.textBaseline = "bottom"; c.textAlign = "right";
+  c.fillText("Corrector de postura", W - margen, H - margen);
+  c.textAlign = "left";
+}
+
+function nombreArchivo() {
+  const d = new Date(), p = (n) => String(n).padStart(2, "0");
+  const ext = Grab.tipo.includes("mp4") ? "mp4" : "webm";
+  return `${estado.ej}-${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}-${p(d.getHours())}${p(d.getMinutes())}.${ext}`;
+}
+
+function mostrarRevision() {
+  if (!Grab.partes.length) return;
+  Grab.blob = new Blob(Grab.partes, { type: Grab.tipo.split(";")[0] });
+  Grab.partes = [];
+  if (Grab.url) URL.revokeObjectURL(Grab.url);
+  Grab.url = URL.createObjectURL(Grab.blob);
+  Grab.nombre = nombreArchivo();
+  Grab.guardado = false;
+  const dur = (performance.now() - Grab.t0) / 1000;
+  $("revInfo").textContent = `${mmss(dur)} · ${(Grab.blob.size / 1048576).toFixed(1)} MB`;
+  const rv = $("revVideo"); rv.src = Grab.url; rv.play().catch(() => {});
+  const a = $("bGuardarVideo"); a.href = Grab.url; a.download = Grab.nombre;
+  $("bDescartar").textContent = "Descartar";
+  $("revNota").className = "nota"; $("revNota").textContent = "";
+  enRevision = true;
+  try { speechSynthesis.cancel(); } catch (e) {}
+  $("revision").hidden = false;
+}
+
+function cerrarRevision() {
+  const rv = $("revVideo"); rv.pause(); rv.removeAttribute("src"); rv.load();
+  if (Grab.url) URL.revokeObjectURL(Grab.url);
+  Grab.url = null; Grab.blob = null;
+  $("revision").hidden = true;
+  enRevision = false;
+}
+$("bDescartar").addEventListener("click", cerrarRevision);
+$("bGuardarVideo").addEventListener("click", () => {
+  Grab.guardado = true;
+  $("bDescartar").textContent = "Cerrar";
+  $("revNota").className = "nota";
+  $("revNota").textContent = "Se descarga a tu celu. En iPhone puede abrirse una vista: tocá Compartir → Guardar video.";
+});
+$("bCompartir").addEventListener("click", async () => {
+  const nota = $("revNota");
+  if (!Grab.blob) return;
+  const archivo = new File([Grab.blob], Grab.nombre, { type: Grab.blob.type });
+  if (navigator.canShare && navigator.canShare({ files: [archivo] })) {
+    try {
+      await navigator.share({ files: [archivo], title: "Mi " + estado.ej });
+      Grab.guardado = true; $("bDescartar").textContent = "Cerrar";
+      nota.className = "nota"; nota.textContent = "Listo.";
+    } catch (e) {
+      if (e?.name !== "AbortError") { nota.className = "nota error"; nota.textContent = "No se pudo compartir. Tocá Guardar y compartilo desde la galería."; }
+    }
+  } else {
+    nota.className = "nota error";
+    nota.textContent = "Este navegador no deja compartir videos directo. Tocá Guardar y compartilo desde la galería.";
+  }
+});
 
 let hudPrevio = "";
 function pintarHud(ej, hayPersona) {
@@ -618,7 +812,7 @@ function pintarHud(ej, hayPersona) {
 }
 
 // Para pruebas automaticas
-window.__corrector = { EJERCICIOS, Avisador, Voz, aplicarExigencia, CFG: () => CFG };
+window.__corrector = { EJERCICIOS, Avisador, Voz, aplicarExigencia, CFG: () => CFG, Grab };
 </script>
 </body>
 </html>
