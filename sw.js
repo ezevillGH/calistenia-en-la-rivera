@@ -1,10 +1,10 @@
 /* Modo sin conexión: siempre intenta bajar lo último (así llega la rutina nueva)
    y si no hay señal usa la copia guardada. */
-const CACHE = "cer-v3";
+const CACHE = "cer-v4";
 const FILES = ["./", "index.html", "rutina.js", "catalogo.js", "reglas.js", "logo.webp", "manifest.webmanifest"];
 
 self.addEventListener("install", e => {
-  e.waitUntil(caches.open(CACHE).then(c => c.addAll(FILES)).then(() => self.skipWaiting()));
+  e.waitUntil(caches.open(CACHE).then(c => c.addAll(FILES.map(f => new Request(f, { cache: "no-cache" })))).then(() => self.skipWaiting()));
 });
 
 self.addEventListener("activate", e => {
@@ -18,7 +18,8 @@ self.addEventListener("fetch", e => {
   if (req.method !== "GET") return;
   const sameOrigin = new URL(req.url).origin === location.origin;
   if (sameOrigin) {
-    e.respondWith(fetch(req).then(res => {
+    // no-cache: revalida con el servidor (si no, GitHub Pages sirve copias de hasta 10 min)
+    e.respondWith(fetch(req.url, { cache: "no-cache" }).then(res => {
       if (res.ok) { const copy = res.clone(); caches.open(CACHE).then(c => c.put(req, copy)); }
       return res;
     }).catch(() => caches.match(req, { ignoreSearch: true }).then(r => r || caches.match("index.html"))));
