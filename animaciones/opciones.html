@@ -32,6 +32,7 @@ h1{font-family:var(--f-display);font-size:22px;letter-spacing:.06em;text-transfo
 .card h2{font-family:var(--f-display);font-size:15px;letter-spacing:.04em;text-transform:uppercase;margin:0;display:flex;gap:8px;align-items:baseline}
 .card h2 b{font-family:var(--f-num);color:var(--chalk);font-size:14px}
 .card p{margin:0;font-size:14px;color:var(--muted)}
+.card p.ley{color:#E4572E;font-weight:600}
 svg{width:100%;height:auto;display:block;border-radius:10px;background:var(--stage)}
 button{height:40px;padding:0 16px;border-radius:999px;border:1.5px solid var(--line);background:none;color:var(--ink);font:600 15px var(--f-body);cursor:pointer}
 button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--surface)}
@@ -40,7 +41,7 @@ button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);
 <body>
 <div class="wrap">
   <h1>Estilos de personaje</h1>
-  <span class="muted">Los cinco usan el mismo esqueleto y las mismas posiciones; cambia solo el dibujo. Elegí el ejercicio:</span>
+  <span class="muted">Los seis usan el mismo esqueleto y las mismas posiciones; cambia solo el dibujo. Elegí el ejercicio:</span>
   <div class="bar" id="bar"></div>
   <div class="grid" id="grid"></div>
 </div>
@@ -86,6 +87,16 @@ const lejos=(s)=>{ const o=s.off, m=q=>add(q,o); return {...s,hip:m(s.hip),knee:
 
 /* ---------- estilos ---------- */
 const ESTILOS = [
+  { id:"mix", n:"Técnica + músculos", leyenda:true, d:"Silueta con los músculos que trabajan encendidos, y encima la línea técnica con el ángulo de codo y rodilla.",
+    draw(s,t,ej){ const base=ESTILOS.find(x=>x.id==="musculos").draw(s,t,ej), I="#0E3A44", A="var(--chalk)";
+      const ln=(a,b,w=2.6)=>seg(a,b,w,I), j=p=>circ(p,3.2,"#F4F7F5",`stroke="${I}" stroke-width="1.8"`);
+      const ae=angulo(s.shoulder,s.elbow,s.wrist), ak=angulo(s.hip,s.knee,s.ankle);
+      const tagE=add(s.elbow,mul(s.hu,19)), tagK=add(s.knee,mul(s.ladoMuslo,21));
+      const txt=(p,v)=>`<text x="${f1(p.x)}" y="${f1(p.y+4)}" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="11" font-weight="700" fill="${A}" stroke="var(--surface)" stroke-width="3" paint-order="stroke">${v}°</text>`;
+      return base+'<g opacity=".85">'+ln(s.hip,s.shoulder,3)+ln(s.shoulder,s.neck)+ln(s.hip,s.knee)+ln(s.knee,s.ankle)+ln(s.ankle,s.toe,2.2)+ln(s.shoulder,s.elbow)+ln(s.elbow,s.wrist)+'</g>'
+        +arco(s.elbow,s.shoulder,s.wrist,11,A)+arco(s.knee,s.hip,s.ankle,11,A)+txt(tagE,ae)+txt(tagK,ak)
+        +[s.hip,s.knee,s.ankle,s.shoulder,s.elbow,s.wrist].map(j).join(""); } },
+
   { id:"plano", n:"Plano", d:"El del prototipo: simple y liviano, se lee bien en pantallas chicas.",
     draw(s){ const C={skin:"#E9B48C",skinF:"#C98F68",shirt:"#58B3D3",shirtF:"#3E8FAD",short:"#1F5F6E",shortF:"#174855",shoe:"#0E3A44",hair:"#3B2A20"};
       const pierna=(q,f)=>seg(q.ankle,q.toe,9,C.shoe)+seg(q.knee,q.ankle,13,f?C.skinF:C.skin)+seg(q.hip,q.knee,14,f?C.skinF:C.skin)+seg(q.hip,lerpP(q.hip,q.knee,.5),15,f?C.shortF:C.short);
@@ -215,7 +226,8 @@ function dibujarBarra(){
     +`<button data-a="play" aria-pressed="${!play}">${play?"Pausa":"Seguir"}</button><button data-a="lento" aria-pressed="${lento}">Lento</button><span class="cue" id="cue"></span>`;
 }
 dibujarBarra();
-grid.innerHTML=ESTILOS.map((s,i)=>`<div class="card"><h2><b>${String.fromCharCode(65+i)}</b>${s.n}</h2><svg id="s${i}" role="img" aria-label="${s.n}"></svg><p>${s.d}</p></div>`).join("");
+grid.innerHTML=ESTILOS.map((s,i)=>`<div class="card"><h2><b>${String.fromCharCode(65+i)}</b>${s.n}</h2><svg id="s${i}" role="img" aria-label="${s.n}"></svg><p>${s.d}</p>${s.leyenda?'<p class="ley" id="ley"></p>':""}</div>`).join("");
+const NOMBRE={pecho:"Pecho",triceps:"Tríceps",hombro:"Hombro",abdomen:"Abdomen",cuadriceps:"Cuádriceps",gluteo:"Glúteo",isquios:"Isquiotibiales",dorsal:"Dorsal",biceps:"Bíceps",antebrazo:"Antebrazo"};
 bar.addEventListener("click",e=>{ const b=e.target.closest("button"); if(!b) return;
   if(b.dataset.ej){ ej=Number(b.dataset.ej); t=0; }
   if(b.dataset.a==="play") play=!play;
@@ -229,6 +241,8 @@ function frame(now){
   const {p,cue}=poseEn(e,t), s=resolver(p,e);
   ESTILOS.forEach((st,i)=>{ const el=document.getElementById("s"+i); el.setAttribute("viewBox",e.vb);
     el.innerHTML=e.escena()+st.draw(s,reloj,e)+(e.barra?e.barra():""); });
+  const ley=document.getElementById("ley"), lt="Trabajan: "+e.musculos.map(m=>NOMBRE[m[0]]||m[0]).join(" · ");
+  if(ley && ley.textContent!==lt) ley.textContent=lt;
   const c=document.getElementById("cue"); if(c && c.textContent!==cue) c.textContent=cue;
   requestAnimationFrame(frame);
 }
