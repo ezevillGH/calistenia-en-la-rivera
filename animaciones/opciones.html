@@ -1,0 +1,239 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Estilos de personaje</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=JetBrains+Mono:wght@600&family=Montserrat:wght@700&display=swap">
+<style>
+:root{
+  --bg:#F4F7F5; --surface:#FFFFFF; --ink:#0E3A44; --muted:#557079; --line:#D6E1E1;
+  --accent:#0E3A44; --chalk:#58B3D3; --done:#4E7C58; --floor:#C9D6D6; --stage:#EEF5F6;
+  --f-display:"Montserrat","Avenir Next",system-ui,sans-serif;
+  --f-body:"Barlow",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-num:"JetBrains Mono",ui-monospace,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0A1E23; --surface:#11292F; --ink:#E3EEF0; --muted:#8EA8AE; --line:#21404A;
+  --accent:#6CC3E0; --done:#76AE7F; --floor:#2A4A54; --stage:#163239; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0A1E23; --surface:#11292F; --ink:#E3EEF0; --muted:#8EA8AE; --line:#21404A;
+  --accent:#6CC3E0; --done:#76AE7F; --floor:#2A4A54; --stage:#163239; color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.45}
+.wrap{max-width:1100px;margin:0 auto;padding:20px 16px 40px}
+h1{font-family:var(--f-display);font-size:22px;letter-spacing:.06em;text-transform:uppercase;margin:0 0 4px}
+.muted{color:var(--muted)}
+.bar{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0 4px;align-items:center}
+.cue{font-weight:700;font-size:18px;color:var(--accent);margin-left:auto;min-height:27px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px;margin-top:12px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:8px}
+.card h2{font-family:var(--f-display);font-size:15px;letter-spacing:.04em;text-transform:uppercase;margin:0;display:flex;gap:8px;align-items:baseline}
+.card h2 b{font-family:var(--f-num);color:var(--chalk);font-size:14px}
+.card p{margin:0;font-size:14px;color:var(--muted)}
+svg{width:100%;height:auto;display:block;border-radius:10px;background:var(--stage)}
+button{height:40px;padding:0 16px;border-radius:999px;border:1.5px solid var(--line);background:none;color:var(--ink);font:600 15px var(--f-body);cursor:pointer}
+button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--surface)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Estilos de personaje</h1>
+  <span class="muted">Los cinco usan el mismo esqueleto y las mismas posiciones; cambia solo el dibujo. Elegí el ejercicio:</span>
+  <div class="bar" id="bar"></div>
+  <div class="grid" id="grid"></div>
+</div>
+<script>
+/* ---------- geometría ---------- */
+const L = { thigh:46, shin:46, torso:56, upper:31, fore:29 };
+const add=(a,b)=>({x:a.x+b.x,y:a.y+b.y}), sub=(a,b)=>({x:a.x-b.x,y:a.y-b.y}), mul=(a,k)=>({x:a.x*k,y:a.y*k});
+const len=a=>Math.hypot(a.x,a.y), unit=a=>mul(a,1/(len(a)||1)), lerpP=(a,b,t)=>({x:a.x+(b.x-a.x)*t,y:a.y+(b.y-a.y)*t});
+const rot=(a,deg)=>{ const r=deg*Math.PI/180, c=Math.cos(r), s=Math.sin(r); return {x:a.x*c-a.y*s, y:a.x*s+a.y*c}; };
+const perp=u=>({x:-u.y,y:u.x}), dotP=(a,b)=>a.x*b.x+a.y*b.y;
+function ik(A,B,l1,l2,hint){
+  let d=len(sub(B,A)); const u=unit(sub(B,A));
+  d=Math.min(Math.max(d,Math.abs(l1-l2)+.01),l1+l2-.01);
+  const a=(l1*l1-l2*l2+d*d)/(2*d), h=Math.sqrt(Math.max(0,l1*l1-a*a)), P=add(A,mul(u,a)), n=perp(u);
+  return add(P,mul(n,h*(dotP(n,hint)>=0?1:-1)));
+}
+const f1=n=>n.toFixed(1);
+const seg=(a,b,w,c,extra="")=>`<line x1="${f1(a.x)}" y1="${f1(a.y)}" x2="${f1(b.x)}" y2="${f1(b.y)}" stroke="${c}" stroke-width="${w}" stroke-linecap="round" ${extra}/>`;
+const circ=(p,r,c,extra="")=>`<circle cx="${f1(p.x)}" cy="${f1(p.y)}" r="${r}" fill="${c}" ${extra}/>`;
+// cápsula con extremos de distinto grosor (miembros con forma)
+function cap(a,b,ra,rb,fill){
+  const n=perp(unit(sub(b,a))), p=[add(a,mul(n,ra)),add(b,mul(n,rb)),add(b,mul(n,-rb)),add(a,mul(n,-ra))];
+  return `<polygon points="${p.map(q=>f1(q.x)+","+f1(q.y)).join(" ")}" fill="${fill}"/>`+circ(a,ra,fill)+circ(b,rb,fill);
+}
+// la misma forma con contorno: primero la silueta agrandada, después el relleno
+const capO=(a,b,ra,rb,fill,o,oc)=>cap(a,b,ra+o,rb+o,oc)+cap(a,b,ra,rb,fill);
+function elipse(c,dir,rx,ry,fill,op=1){ const ang=Math.atan2(dir.y,dir.x)*180/Math.PI;
+  return `<ellipse cx="${f1(c.x)}" cy="${f1(c.y)}" rx="${rx}" ry="${ry}" transform="rotate(${f1(ang)} ${f1(c.x)} ${f1(c.y)})" fill="${fill}" opacity="${op.toFixed(2)}"/>`; }
+function angulo(A,J,B){ const u=unit(sub(A,J)), v=unit(sub(B,J)); return Math.round(Math.acos(Math.max(-1,Math.min(1,dotP(u,v))))*180/Math.PI); }
+function arco(J,A,B,r,c){ const u=unit(sub(A,J)), v=unit(sub(B,J)), a=add(J,mul(u,r)), b=add(J,mul(v,r));
+  const cross=u.x*v.y-u.y*v.x; return `<path d="M${f1(a.x)} ${f1(a.y)} A${r} ${r} 0 0 ${cross>0?1:0} ${f1(b.x)} ${f1(b.y)}" fill="none" stroke="${c}" stroke-width="2"/>`; }
+
+/* ---------- esqueleto resuelto ---------- */
+function resolver(p,ex){
+  const k=ik(p.hip,p.ankle,L.thigh,L.shin,ex.knee), e=ik(p.shoulder,p.wrist,L.upper,L.fore,ex.elbow);
+  const up=unit(sub(p.shoulder,p.hip)), hu=rot(up,p.head||0), head=add(p.shoulder,mul(hu,27)), neck=add(p.shoulder,mul(rot(up,(p.head||0)/2),10));
+  const fwd=rot(hu,90), toe=add(p.ankle,ex.foot), off={x:-3,y:-2};
+  // lado "de adelante" de muslo y brazo (para dibujar cuádriceps, tríceps, etc.)
+  const ladoMuslo=unit(sub(k,lerpP(p.hip,p.ankle,.5))), ladoBrazo=unit(sub(e,lerpP(p.shoulder,p.wrist,.5)));
+  return {...p,knee:k,elbow:e,up,hu,head,neck,fwd,toe,off,ladoMuslo,ladoBrazo};
+}
+const lejos=(s)=>{ const o=s.off, m=q=>add(q,o); return {...s,hip:m(s.hip),knee:m(s.knee),ankle:m(s.ankle),toe:m(s.toe),shoulder:m(s.shoulder),elbow:m(s.elbow),wrist:m(s.wrist)}; };
+
+/* ---------- estilos ---------- */
+const ESTILOS = [
+  { id:"plano", n:"Plano", d:"El del prototipo: simple y liviano, se lee bien en pantallas chicas.",
+    draw(s){ const C={skin:"#E9B48C",skinF:"#C98F68",shirt:"#58B3D3",shirtF:"#3E8FAD",short:"#1F5F6E",shortF:"#174855",shoe:"#0E3A44",hair:"#3B2A20"};
+      const pierna=(q,f)=>seg(q.ankle,q.toe,9,C.shoe)+seg(q.knee,q.ankle,13,f?C.skinF:C.skin)+seg(q.hip,q.knee,14,f?C.skinF:C.skin)+seg(q.hip,lerpP(q.hip,q.knee,.5),15,f?C.shortF:C.short);
+      const brazo=(q,f)=>seg(q.shoulder,q.elbow,11,f?C.skinF:C.skin)+seg(q.elbow,q.wrist,10,f?C.skinF:C.skin)+seg(q.shoulder,lerpP(q.shoulder,q.elbow,.35),13,f?C.shirtF:C.shirt)+circ(q.wrist,6,f?C.skinF:C.skin);
+      const F=lejos(s), eye=add(s.head,add(mul(s.fwd,5),mul(s.hu,2))), back=add(s.head,add(mul(s.fwd,-4),mul(s.hu,5)));
+      return pierna(F,1)+brazo(F,1)+seg(lerpP(s.hip,s.shoulder,.08),s.shoulder,28,C.shirt)+seg(s.hip,lerpP(s.hip,s.shoulder,.1),28,C.short)
+        +pierna(s,0)+seg(s.neck,s.shoulder,9,C.skin)+circ(s.head,13,C.skin)+circ(back,10,C.hair)+circ(s.head,11.5,C.skin)+circ(eye,1.8,"#0E3A44")+brazo(s,0); } },
+
+  { id:"atleta", n:"Atleta cartoon", d:"Contorno marcado, músculos con forma, vincha y muñequeras con los colores del grupo.",
+    draw(s){ const O="#0E3A44", o=2.2, C={skin:"#F0BC94",skinF:"#D39A72",shirt:"#58B3D3",shirtF:"#3C8DAA",short:"#1F5F6E",shortF:"#164A57",shoe:"#F4F7F5",sole:"#0E3A44",band:"#4E7C58",hair:"#2E1F17"};
+      const pierna=(q,f)=>{ const sk=f?C.skinF:C.skin;
+        return capO(q.ankle,q.toe,5,4,C.shoe,o,O)+seg(add(q.ankle,{x:0,y:4}),add(q.toe,{x:0,y:3}),2.5,C.sole)
+          +capO(q.knee,q.ankle,6.5,4.5,sk,o,O)+circ(lerpP(q.knee,q.ankle,.3),6.8,sk)   // pantorrilla
+          +capO(q.hip,q.knee,10,6.8,sk,o,O)+capO(q.hip,lerpP(q.hip,q.knee,.55),11,9,f?C.shortF:C.short,o,O); };
+      const brazo=(q,f)=>{ const sk=f?C.skinF:C.skin;
+        return capO(q.shoulder,q.elbow,7.5,5.2,sk,o,O)+capO(q.elbow,q.wrist,5.6,4.2,sk,o,O)
+          +capO(lerpP(q.elbow,q.wrist,.82),q.wrist,4.8,4.8,C.band,1.6,O)+circ(q.wrist,6.6,O)+circ(q.wrist,5.2,sk)
+          +capO(q.shoulder,lerpP(q.shoulder,q.elbow,.4),9,7.5,f?C.shirtF:C.shirt,o,O); };
+      const F=lejos(s), h=s.head, fw=s.fwd, hu=s.hu;
+      const eye=add(h,add(mul(fw,6),mul(hu,2.5))), brow=[add(eye,add(mul(fw,-2.5),mul(hu,3.5))),add(eye,add(mul(fw,2.5),mul(hu,4)))];
+      const mouth=[add(h,add(mul(fw,7),mul(hu,-4))),add(h,add(mul(fw,10),mul(hu,-3)))];
+      const hair=`<path d="M${f1(add(h,add(mul(fw,8),mul(hu,9))).x)} ${f1(add(h,add(mul(fw,8),mul(hu,9))).y)} Q${f1(add(h,mul(hu,19)).x)} ${f1(add(h,mul(hu,19)).y)} ${f1(add(h,add(mul(fw,-13),mul(hu,4))).x)} ${f1(add(h,add(mul(fw,-13),mul(hu,4))).y)} L${f1(add(h,add(mul(fw,-10),mul(hu,-6))).x)} ${f1(add(h,add(mul(fw,-10),mul(hu,-6))).y)} Z" fill="${C.hair}"/>`;
+      const band=seg(add(h,add(mul(fw,-13),mul(hu,6))),add(h,add(mul(fw,11),mul(hu,8))),4.5,C.band);
+      return pierna(F,1)+brazo(F,1)+capO(s.hip,s.shoulder,14,16,C.shirt,o,O)+capO(s.hip,lerpP(s.hip,s.shoulder,.14),14.5,14.5,C.short,o,O)
+        +pierna(s,0)+capO(s.neck,s.shoulder,5,6,C.skin,o,O)+circ(h,15.2,O)+circ(h,13,C.skin)+hair+band
+        +circ(add(h,mul(fw,-3)),3.2,"#E2A47C")+circ(eye,2,O)+seg(brow[0],brow[1],1.8,O)+seg(mouth[0],mouth[1],1.6,O)+brazo(s,0); } },
+
+  { id:"ella", n:"Atleta cartoon (ella)", d:"Misma base con top, calzas y colita que se mueve con el cuerpo.",
+    draw(s,t){ const O="#0E3A44", o=2.2, C={skin:"#C98D66",skinF:"#AE7653",top:"#4E7C58",topF:"#3B6243",leg:"#0E3A44",legF:"#0A2C34",shoe:"#58B3D3",sole:"#F4F7F5",hair:"#1C1410",band:"#58B3D3"};
+      const pierna=(q,f)=>capO(q.ankle,q.toe,5,4,C.shoe,o,O)+seg(add(q.ankle,{x:0,y:4}),add(q.toe,{x:0,y:3}),2.5,C.sole)
+          +capO(q.knee,q.ankle,6.2,4.4,f?C.legF:C.leg,o,O)+capO(q.hip,q.knee,9.5,6.5,f?C.legF:C.leg,o,O);
+      const brazo=(q,f)=>{ const sk=f?C.skinF:C.skin; return capO(q.shoulder,q.elbow,6.8,4.8,sk,o,O)+capO(q.elbow,q.wrist,5,3.8,sk,o,O)+circ(q.wrist,6,O)+circ(q.wrist,4.7,sk); };
+      const F=lejos(s), h=s.head, fw=s.fwd, hu=s.hu;
+      // colita: cuelga desde la nuca con un poco de balanceo
+      const nape=add(h,add(mul(fw,-11),mul(hu,4))), sway=Math.sin(t*4)*4, tip=add(nape,add({x:0,y:22},mul(fw,-8+sway)));
+      const mid=add(lerpP(nape,tip,.5),mul(fw,-6));
+      const tail=`<path d="M${f1(nape.x)} ${f1(nape.y)} Q${f1(mid.x)} ${f1(mid.y)} ${f1(tip.x)} ${f1(tip.y)}" stroke="${O}" stroke-width="11" fill="none" stroke-linecap="round"/><path d="M${f1(nape.x)} ${f1(nape.y)} Q${f1(mid.x)} ${f1(mid.y)} ${f1(tip.x)} ${f1(tip.y)}" stroke="${C.hair}" stroke-width="7" fill="none" stroke-linecap="round"/>`;
+      const eye=add(h,add(mul(fw,6),mul(hu,2.5))), lash=add(eye,add(mul(fw,2.5),mul(hu,2.5)));
+      const hair=`<path d="M${f1(add(h,add(mul(fw,9),mul(hu,8))).x)} ${f1(add(h,add(mul(fw,9),mul(hu,8))).y)} Q${f1(add(h,mul(hu,18)).x)} ${f1(add(h,mul(hu,18)).y)} ${f1(add(h,add(mul(fw,-14),mul(hu,2))).x)} ${f1(add(h,add(mul(fw,-14),mul(hu,2))).y)} L${f1(add(h,add(mul(fw,-11),mul(hu,-7))).x)} ${f1(add(h,add(mul(fw,-11),mul(hu,-7))).y)} Z" fill="${C.hair}"/>`;
+      return tail+pierna(F,1)+brazo(F,1)+capO(lerpP(s.hip,s.shoulder,.35),s.shoulder,13,14.5,C.top,o,O)+capO(s.hip,lerpP(s.hip,s.shoulder,.4),13.5,12.5,C.skin,o,O)
+        +capO(s.hip,lerpP(s.hip,s.shoulder,.12),13.8,13.8,C.leg,o,O)
+        +pierna(s,0)+capO(s.neck,s.shoulder,4.6,5.5,C.skin,o,O)+circ(h,15,O)+circ(h,12.8,C.skin)+hair+circ(add(nape,mul(fw,1)),3.5,C.band)
+        +circ(eye,2,O)+seg(eye,lash,1.4,O)+seg(add(h,add(mul(fw,7),mul(hu,-4))),add(h,add(mul(fw,10),mul(hu,-3.2))),1.6,O)+brazo(s,0); } },
+
+  { id:"tecnica", n:"Línea técnica", d:"Esqueleto con articulaciones y el ángulo de codo y rodilla en vivo. Ideal para explicar técnica.",
+    draw(s){ const I="var(--ink)", A="var(--chalk)";
+      const ln=(a,b,w=5,c=I)=>seg(a,b,w,c), j=p=>circ(p,4.5,"var(--surface)",`stroke="${I}" stroke-width="2.5"`);
+      const F=lejos(s), fa=`opacity=".35"`;
+      const lejosSvg=`<g ${fa}>${ln(F.hip,F.knee)+ln(F.knee,F.ankle)+ln(F.ankle,F.toe,4)+ln(F.shoulder,F.elbow)+ln(F.elbow,F.wrist)}</g>`;
+      const ae=angulo(s.shoulder,s.elbow,s.wrist), ak=angulo(s.hip,s.knee,s.ankle);
+      const tagE=add(s.elbow,mul(s.hu,17)), tagK=add(s.knee,mul(s.ladoMuslo,18));
+      const txt=(p,v)=>`<text x="${f1(p.x)}" y="${f1(p.y+4)}" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="11" font-weight="600" fill="${A}">${v}°</text>`;
+      return lejosSvg+ln(s.hip,s.shoulder,6)+ln(s.shoulder,s.neck,4)+circ(s.head,12,"none",`stroke="${I}" stroke-width="4"`)
+        +ln(s.hip,s.knee)+ln(s.knee,s.ankle)+ln(s.ankle,s.toe,4)+ln(s.shoulder,s.elbow)+ln(s.elbow,s.wrist)
+        +arco(s.elbow,s.shoulder,s.wrist,11,A)+arco(s.knee,s.hip,s.ankle,11,A)+txt(tagE,ae)+txt(tagK,ak)
+        +[s.hip,s.knee,s.ankle,s.shoulder,s.elbow,s.wrist].map(j).join(""); } },
+
+  { id:"musculos", n:"Músculos que trabajan", d:"Silueta neutra; se encienden los músculos del ejercicio, más fuerte cuando hacen más esfuerzo.",
+    draw(s,t,ej){ const G="#B9C7CA", GF="#9DAEB2", ON="#E4572E", a=s.act??.5;
+      const sil=(q,c)=>cap(q.ankle,q.toe,5,4,c)+cap(q.knee,q.ankle,6.5,4.5,c)+cap(q.hip,q.knee,10,6.8,c)+cap(q.shoulder,q.elbow,7.5,5.2,c)+cap(q.elbow,q.wrist,5.6,4.2,c)+circ(q.wrist,5.2,c);
+      const F=lejos(s);
+      // músculo: posición sobre el segmento y lado (adelante/atrás)
+      const M={
+        pecho:   ()=>elipse(add(lerpP(s.hip,s.shoulder,.78),mul(s.fwd,9)),s.up,11,6,ON),
+        dorsal:  ()=>elipse(add(lerpP(s.hip,s.shoulder,.68),mul(s.fwd,-9)),s.up,15,6,ON),
+        abdomen: ()=>elipse(add(lerpP(s.hip,s.shoulder,.35),mul(s.fwd,9)),s.up,11,5,ON),
+        hombro:  ()=>circ(s.shoulder,8,ON),
+        triceps: ()=>elipse(add(lerpP(s.shoulder,s.elbow,.5),mul(s.ladoBrazo,3.5)),sub(s.elbow,s.shoulder),11,4.5,ON),
+        biceps:  ()=>elipse(add(lerpP(s.shoulder,s.elbow,.5),mul(s.ladoBrazo,-3.5)),sub(s.elbow,s.shoulder),11,4.5,ON),
+        antebrazo:()=>elipse(lerpP(s.elbow,s.wrist,.4),sub(s.wrist,s.elbow),9,4,ON),
+        cuadriceps:()=>elipse(add(lerpP(s.hip,s.knee,.5),mul(s.ladoMuslo,3.5)),sub(s.knee,s.hip),18,6,ON),
+        gluteo:  ()=>elipse(add(s.hip,mul(s.fwd,-8)),s.up,9,8,ON),
+        isquios: ()=>elipse(add(lerpP(s.hip,s.knee,.5),mul(s.ladoMuslo,-4)),sub(s.knee,s.hip),15,4.5,ON) };
+      const on=ej.musculos.map(([m,w])=>M[m]().replace(/opacity="[^"]*"|\/>$/, x=>x)).map((svg,i)=>`<g opacity="${(.25+.75*a*ej.musculos[i][1]).toFixed(2)}">${svg}</g>`).join("");
+      const sil0=sil(F,GF)+cap(s.hip,s.shoulder,14,16,G)+cap(s.neck,s.shoulder,5,6,G)+circ(s.head,13,G)+sil(s,G);
+      return sil0+on; } }
+];
+
+/* ---------- ejercicios (posiciones clave; act = esfuerzo 0–1 para los músculos) ---------- */
+const P=(x,y)=>({x,y});
+const EJ = [
+  { n:"Flexiones", vb:"20 180 260 132", knee:P(0,-1), elbow:P(-1,-.4), foot:P(5,11),
+    musculos:[["pecho",1],["triceps",1],["hombro",.8],["abdomen",.5]],
+    keys:[
+      {t:0,   cue:"Cuerpo alineado", pose:{ankle:P(48,288),hip:P(134.6,256.9),shoulder:P(187,238),wrist:P(190,296),act:.3}},
+      {t:.4,  cue:"Bajá controlado", pose:{ankle:P(48,288),hip:P(134.6,256.9),shoulder:P(187,238),wrist:P(190,296),act:.4}},
+      {t:1.5, cue:"Pecho cerca del piso", pose:{ankle:P(48,288),hip:P(139.7,280.5),shoulder:P(195.5,276),wrist:P(190,296),act:.8}},
+      {t:1.75,cue:"Empujá el piso", pose:{ankle:P(48,288),hip:P(139.7,280.5),shoulder:P(195.5,276),wrist:P(190,296),act:1}},
+      {t:2.6, cue:"Cuerpo alineado", pose:{ankle:P(48,288),hip:P(134.6,256.9),shoulder:P(187,238),wrist:P(190,296),act:.3}}],
+    escena:()=>`<line x1="10" y1="300" x2="290" y2="300" stroke="var(--floor)" stroke-width="4" stroke-linecap="round"/>` },
+  { n:"Sentadilla", vb:"40 104 220 206", knee:P(1,0), elbow:P(0,1), foot:P(20,7),
+    musculos:[["cuadriceps",1],["gluteo",1],["isquios",.5],["abdomen",.4]],
+    keys:[
+      {t:0,   cue:"Parado, core activo", pose:{ankle:P(150,290),hip:P(150,199),shoulder:P(150,143),wrist:P(208,148),head:0,act:.2}},
+      {t:.3,  cue:"Cadera atrás y abajo", pose:{ankle:P(150,290),hip:P(150,199),shoulder:P(150,143),wrist:P(208,148),head:0,act:.3}},
+      {t:1.5, cue:"Talones apoyados", pose:{ankle:P(150,290),hip:P(104,250),shoulder:P(140,207),wrist:P(200,203),head:-22,act:.8}},
+      {t:1.8, cue:"Empujá el piso", pose:{ankle:P(150,290),hip:P(104,250),shoulder:P(140,207),wrist:P(200,203),head:-22,act:1}},
+      {t:2.8, cue:"Parado, core activo", pose:{ankle:P(150,290),hip:P(150,199),shoulder:P(150,143),wrist:P(208,148),head:0,act:.2}}],
+    escena:()=>`<line x1="10" y1="300" x2="290" y2="300" stroke="var(--floor)" stroke-width="4" stroke-linecap="round"/>` },
+  { n:"Dominada", vb:"50 14 220 296", knee:P(-1,0), elbow:P(1,.3), foot:P(3,14),
+    musculos:[["dorsal",1],["biceps",1],["antebrazo",.6],["abdomen",.4]],
+    keys:[
+      {t:0,   cue:"Colgado", pose:{ankle:P(157,262),hip:P(154,171),shoulder:P(154,115),wrist:P(156,52),head:0,act:.2}},
+      {t:.5,  cue:"Activá escápulas", pose:{ankle:P(157,256),hip:P(154,165),shoulder:P(154,109),wrist:P(156,52),head:0,act:.5}},
+      {t:.7,  cue:"Tirá, codos abajo", pose:{ankle:P(157,256),hip:P(154,165),shoulder:P(154,109),wrist:P(156,52),head:0,act:.7}},
+      {t:1.7, cue:"Mentón sobre la barra", pose:{ankle:P(149,213),hip:P(141,122),shoulder:P(140,66),wrist:P(156,52),head:-6,act:1}},
+      {t:2.0, cue:"Bajá controlado", pose:{ankle:P(149,213),hip:P(141,122),shoulder:P(140,66),wrist:P(156,52),head:-6,act:.9}},
+      {t:3.5, cue:"Colgado", pose:{ankle:P(157,262),hip:P(154,171),shoulder:P(154,115),wrist:P(156,52),head:0,act:.2}}],
+    escena:()=>`<path d="M156 46 H246 V300" fill="none" stroke="var(--floor)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+      <line x1="10" y1="300" x2="290" y2="300" stroke="var(--floor)" stroke-width="4" stroke-linecap="round"/>`,
+    barra:()=>`<circle cx="156" cy="46" r="6" fill="var(--muted)"/>` }
+];
+EJ.forEach(e=>e.dur=e.keys.at(-1).t);
+const ease=t=>t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2;
+function poseEn(e,t){
+  const k=e.keys; let i=0; while(i<k.length-2 && t>=k[i+1].t) i++;
+  const a=k[i], b=k[i+1], f=b.t===a.t?0:ease(Math.min(1,Math.max(0,(t-a.t)/(b.t-a.t)))), p={};
+  for(const n of Object.keys(a.pose)) p[n]= typeof a.pose[n]==="number" ? a.pose[n]+(b.pose[n]-a.pose[n])*f : lerpP(a.pose[n],b.pose[n],f);
+  return {p, cue:a.cue};
+}
+
+/* ---------- página ---------- */
+let ej=0, t=0, play=true, lento=false;
+const bar=document.getElementById("bar"), grid=document.getElementById("grid");
+function dibujarBarra(){
+  bar.innerHTML=EJ.map((e,i)=>`<button data-ej="${i}" aria-pressed="${i===ej}">${e.n}</button>`).join("")
+    +`<button data-a="play" aria-pressed="${!play}">${play?"Pausa":"Seguir"}</button><button data-a="lento" aria-pressed="${lento}">Lento</button><span class="cue" id="cue"></span>`;
+}
+dibujarBarra();
+grid.innerHTML=ESTILOS.map((s,i)=>`<div class="card"><h2><b>${String.fromCharCode(65+i)}</b>${s.n}</h2><svg id="s${i}" role="img" aria-label="${s.n}"></svg><p>${s.d}</p></div>`).join("");
+bar.addEventListener("click",e=>{ const b=e.target.closest("button"); if(!b) return;
+  if(b.dataset.ej){ ej=Number(b.dataset.ej); t=0; }
+  if(b.dataset.a==="play") play=!play;
+  if(b.dataset.a==="lento") lento=!lento;
+  dibujarBarra(); });
+if(matchMedia("(prefers-reduced-motion: reduce)").matches) lento=true;
+let last=performance.now(), reloj=0;
+function frame(now){
+  const dt=Math.min(.1,(now-last)/1000); last=now;
+  const e=EJ[ej]; if(play){ t=(t+dt*(lento?.4:1))%e.dur; reloj+=dt*(lento?.4:1); }
+  const {p,cue}=poseEn(e,t), s=resolver(p,e);
+  ESTILOS.forEach((st,i)=>{ const el=document.getElementById("s"+i); el.setAttribute("viewBox",e.vb);
+    el.innerHTML=e.escena()+st.draw(s,reloj,e)+(e.barra?e.barra():""); });
+  const c=document.getElementById("cue"); if(c && c.textContent!==cue) c.textContent=cue;
+  requestAnimationFrame(frame);
+}
+window.__fijar=(e,tt)=>{ ej=e; t=tt; play=false; dibujarBarra(); };  // para revisar posiciones
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>
