@@ -41,6 +41,8 @@ button{font:inherit;color:inherit}
 .fila{display:flex;gap:8px;flex-wrap:wrap}
 .seg{flex:1;min-width:0;background:var(--panel);border:2px solid var(--line);border-radius:12px;padding:11px 8px;cursor:pointer;font-weight:600;font-size:15px}
 .seg[aria-pressed="true"]{border-color:var(--chalk);color:var(--chalk)}
+.chequeos .seg{flex:1 1 30%;font-size:14px;padding:10px 4px}
+.chequeos .seg[aria-pressed="false"]{color:var(--muted);text-decoration:line-through;opacity:.7}
 .tips{margin:0;padding:0;list-style:none;display:grid;gap:8px;color:var(--muted);font-size:14px;line-height:1.4}
 .tips li{padding-left:18px;position:relative}
 .tips li::before{content:"";position:absolute;left:2px;top:.55em;width:7px;height:7px;border-radius:2px;background:var(--chalk)}
@@ -134,6 +136,17 @@ button{font:inherit;color:inherit}
     </div>
   </section>
 
+  <section id="secChequeos">
+    <p class="rotulo">Qué corrige en la vertical</p>
+    <div class="fila chequeos" id="chequeos">
+      <button class="seg" data-chk="codos" aria-pressed="true">Codos</button>
+      <button class="seg" data-chk="hombros" aria-pressed="true">Hombros</button>
+      <button class="seg" data-chk="cadera" aria-pressed="true">Cadera</button>
+      <button class="seg" data-chk="piernas" aria-pressed="true">Piernas</button>
+      <button class="seg" data-chk="pies" aria-pressed="true">Pies</button>
+    </div>
+  </section>
+
   <section>
     <p class="rotulo">Exigencia</p>
     <div class="fila" id="exigencias">
@@ -219,7 +232,7 @@ const BASE = {
   linea: { tol: 12, inclMax: 35, rodillaMin: 160 },
   plancha: { cadaS: 10 },
   flexiones: { arriba: 160, abajo: 95 },
-  vertical: { inclMax: 30, codoMin: 165, hombroMin: 160, caderaMin: 160, rodillaMin: 160, apiladoMax: 12, cadaS: 5 },
+  vertical: { inclMax: 30, codoMin: 155, codoSostener: 0.8, codoVisMin: 0.65, hombroMin: 160, caderaMin: 160, rodillaMin: 160, apiladoMax: 12, cadaS: 5 },
 };
 const EXIGENCIA = { suave: 1.6, normal: 1.0, estricta: 0.6 };
 let CFG = structuredClone(BASE);
@@ -248,6 +261,11 @@ const deg = (r) => r * 180 / Math.PI;
 function angulo(a, b, c) {
   const bax = a.x - b.x, bay = a.y - b.y, bcx = c.x - b.x, bcy = c.y - b.y;
   const cos = (bax * bcx + bay * bcy) / (Math.hypot(bax, bay) * Math.hypot(bcx, bcy) + 1e-9);
+  return deg(Math.acos(Math.max(-1, Math.min(1, cos))));
+}
+function angulo3d(a, b, c) {
+  const u = [a.x - b.x, a.y - b.y, a.z - b.z], v = [c.x - b.x, c.y - b.y, c.z - b.z];
+  const cos = (u[0] * v[0] + u[1] * v[1] + u[2] * v[2]) / (Math.hypot(...u) * Math.hypot(...v) + 1e-9);
   return deg(Math.acos(Math.max(-1, Math.min(1, cos))));
 }
 function desvioVertical(p0, pm, p1) {   // + = pm por debajo de la recta p0-p1
@@ -303,10 +321,10 @@ if ("speechSynthesis" in window) {
 // ---------------- Avisos (error sostenido + cooldown) ----------------
 const Avisador = {
   inicio: {}, ultimo: {},
-  evaluar(clave, activo, msg, t, hablar = true) {
+  evaluar(clave, activo, msg, t, hablar = true, sostener = CFG.sostener) {
     if (!activo) { delete this.inicio[clave]; return false; }
     const t0 = this.inicio[clave] ??= t;
-    if (t - t0 < CFG.sostener) return false;
+    if (t - t0 < sostener) return false;
     if (hablar && t - (this.ultimo[clave] ?? -1e9) >= CFG.cooldown) { this.ultimo[clave] = t; Voz.decir(msg); }
     return true;
   },
@@ -392,13 +410,36 @@ class Flexiones extends Ejercicio {
 }
 
 class Vertical extends Ejercicio {
-  reiniciar() { super.reiniciar(); this.total = 0; this.bien = 0; this.mejor = 0; this.racha = 0; this.tPrev = null; this.prox = CFG.vertical.cadaS; }
-  actualizar(pts, vis, t) {
+  reiniciar() { super.reiniciar(); this.total = 0; this.bien = 0; this.mejor = 0; this.racha = 0; this.tPrev = null; this.prox = CFG.vertical.cadaS; this.histCodo = []; }
+
+  // Angulo de codo "a prueba de errores de deteccion":
+  // mide los dos brazos en 2D y en 3D, descarta mediciones con proporciones imposibles
+  // y se queda con el valor MAS RECTO (solo hay error si todas coinciden en que esta doblado).
+  // Despues toma la mediana de los ultimos ~10 cuadros para ignorar saltos.
+  codoRobusto(pts, vis, mundo) {
+    const V = CFG.vertical, medidas = [];
+    for (const lado of [0, 1]) {
+      const iH = HOMBRO[lado], iC = CODO[lado], iM = MUNECA[lado];
+      if (Math.min(vis[iH], vis[iC], vis[iM]) < V.codoVisMin) continue;
+      const brazo = Math.hypot(pts[iC].x - pts[iH].x, pts[iC].y - pts[iH].y);
+      const ante = Math.hypot(pts[iM].x - pts[iC].x, pts[iM].y - pts[iC].y);
+      if (brazo < 1 || ante / brazo < 0.55 || ante / brazo > 1.6) continue;   // proporcion imposible: mala deteccion
+      medidas.push(angulo(pts[iM], pts[iC], pts[iH]));
+      if (mundo) medidas.push(angulo3d(mundo[iM], mundo[iC], mundo[iH]));
+    }
+    if (!medidas.length) { this.histCodo = []; return null; }
+    this.histCodo.push(Math.max(...medidas));
+    if (this.histCodo.length > 10) this.histCodo.shift();
+    const orden = [...this.histCodo].sort((a, b) => a - b);
+    return orden[Math.floor(orden.length / 2)];
+  }
+
+  actualizar(pts, vis, t, mundo) {
     const V = CFG.vertical, claves = ["codos", "hombros", "cadera", "vpiernas", "apilado"];
     this.elegirLado(vis);
     this.errores = []; this.info = {};
     const dt = this.tPrev === null ? 0 : Math.min(t - this.tPrev, 0.5); this.tPrev = t;
-    if (!this.visibles(vis, [MUNECA, CODO, HOMBRO, CADERA, RODILLA, TOBILLO])) {
+    if (!this.visibles(vis, [MUNECA, HOMBRO, CADERA, RODILLA, TOBILLO])) {
       this.enPos = false;
     } else {
       const mu = this.p(MUNECA, pts), ho = this.p(HOMBRO, pts), ca = this.p(CADERA, pts), to = this.p(TOBILLO, pts);
@@ -409,7 +450,7 @@ class Vertical extends Ejercicio {
 
     const mu = this.p(MUNECA, pts), co = this.p(CODO, pts), ho = this.p(HOMBRO, pts);
     const ca = this.p(CADERA, pts), ro = this.p(RODILLA, pts), to = this.p(TOBILLO, pts);
-    const codo = this.s("codo", angulo(mu, co, ho));
+    const codo = this.codoRobusto(pts, vis, mundo);
     const hombro = this.s("hombro", angulo(mu, ho, ca));
     const cadera = this.s("cadera", angulo(ho, ca, to));
     const rodilla = this.s("rodilla", angulo(ca, ro, to));
@@ -427,15 +468,16 @@ class Vertical extends Ejercicio {
     else if (Math.sign(despCadera) === frente) { cadVoz = "Abrí la cadera, subí los pies"; cadTxt = "Cadera flexionada"; }
     else { cadVoz = "Meté la cola y cerrá las costillas"; cadTxt = "Banana"; }
 
+    const on = (k) => estado.chequeos[k] !== false;
     const chequeos = [
-      ["codos", codo < V.codoMin, "Bloqueá los codos", "Codos"],
-      ["hombros", hombro < V.hombroMin, "Abrí los hombros, empujá el piso", "Hombros cerrados"],
-      ["cadera", cadera < V.caderaMin, cadVoz, cadTxt],
-      ["vpiernas", rodilla < V.rodillaMin, "Estirá las piernas", "Piernas"],
-      ["apilado", apilado > V.apiladoMax, "Llevá los pies arriba de las manos", "Pies fuera de línea"],
+      ["codos", on("codos") && codo !== null && codo < V.codoMin, "Bloqueá los codos", "Codos", V.codoSostener],
+      ["hombros", on("hombros") && hombro < V.hombroMin, "Abrí los hombros, empujá el piso", "Hombros cerrados"],
+      ["cadera", on("cadera") && cadera < V.caderaMin, cadVoz, cadTxt],
+      ["vpiernas", on("piernas") && rodilla < V.rodillaMin, "Estirá las piernas", "Piernas"],
+      ["apilado", on("pies") && apilado > V.apiladoMax, "Llevá los pies arriba de las manos", "Pies fuera de línea"],
     ];
-    for (const [k, act, voz, txt] of chequeos)
-      if (Avisador.evaluar(k, act, voz, t, this.errores.length === 0)) this.errores.push(txt);
+    for (const [k, act, voz, txt, sost] of chequeos)
+      if (Avisador.evaluar(k, act, voz, t, this.errores.length === 0, sost)) this.errores.push(txt);
 
     this.total += dt;
     if (!this.errores.length) {
@@ -444,7 +486,12 @@ class Vertical extends Ejercicio {
     } else this.racha = 0;
   }
   metrica() { return { lbl: "Tiempo con buena línea", num: this.bien.toFixed(1), sub: `Invertido ${this.total.toFixed(1)} s · mejor tramo ${this.mejor.toFixed(1)} s` }; }
-  angulos() { const i = this.info; return i.codo ? `Codo ${i.codo.toFixed(0)}° · Hombro ${i.hombro.toFixed(0)}° · Cadera ${i.cadera.toFixed(0)}°` : ""; }
+  angulos() {
+    const i = this.info;
+    if (i.hombro === undefined) return "";
+    const codo = i.codo === null ? "Codo —" : `Codo ${i.codo.toFixed(0)}°`;
+    return `${codo} · Hombro ${i.hombro.toFixed(0)}° · Cadera ${i.cadera.toFixed(0)}°`;
+  }
   pista() { return "Subí a la vertical, de perfil al celu"; }
 }
 
@@ -465,7 +512,7 @@ const EJERCICIOS = { vertical: new Vertical(), plancha: new Plancha(), flexiones
 
 // ---------------- Estado de la app ----------------
 const $ = (id) => document.getElementById(id);
-const estado = { ej: "vertical", cam: "environment", exigencia: "normal" };
+const estado = { ej: "vertical", cam: "environment", exigencia: "normal", chequeos: {} };
 try {
   const g = JSON.parse(localStorage.getItem("corrector-postura") || "{}");
   Object.assign(estado, g);
@@ -477,12 +524,20 @@ function marcar(contenedor, attr, valor) {
 }
 function pintarInicio() {
   marcar($("ejercicios"), "ej", estado.ej);
+  $("chequeos").querySelectorAll("[data-chk]").forEach((b) => b.setAttribute("aria-pressed", String(estado.chequeos[b.dataset.chk] !== false)));
+  $("secChequeos").hidden = estado.ej !== "vertical";
   marcar($("camaras"), "cam", estado.cam);
   marcar($("exigencias"), "ex", estado.exigencia);
 }
 pintarInicio();
 $("ejercicios").addEventListener("click", (e) => { const b = e.target.closest("[data-ej]"); if (b) { estado.ej = b.dataset.ej; guardar(); pintarInicio(); } });
 $("camaras").addEventListener("click", (e) => { const b = e.target.closest("[data-cam]"); if (b) { estado.cam = b.dataset.cam; guardar(); pintarInicio(); } });
+$("chequeos").addEventListener("click", (e) => {
+  const b = e.target.closest("[data-chk]"); if (!b) return;
+  const k = b.dataset.chk;
+  estado.chequeos = { ...estado.chequeos, [k]: estado.chequeos[k] === false };
+  guardar(); pintarInicio();
+});
 $("exigencias").addEventListener("click", (e) => { const b = e.target.closest("[data-ex]"); if (b) { estado.exigencia = b.dataset.ex; guardar(); pintarInicio(); } });
 
 // ---------------- Camara y detector ----------------
@@ -595,14 +650,15 @@ function ciclo() {
   try { res = detector.detectForVideo(video, ahora); } catch (e) { return; }
   const ej = EJERCICIOS[estado.ej];
   const t = ahora / 1000;
-  let pts = null, vis = null;
+  let pts = null, vis = null, mundo = null;
+  if (res?.worldLandmarks?.length) mundo = res.worldLandmarks[0];
   if (res?.landmarks?.length) {
     const lm = res.landmarks[0];
     pts = lm.map((p) => ({ x: p.x * w, y: p.y * h }));
     vis = lm.map((p) => (p.visibility ?? 1));
   }
   if (ej instanceof Libre) ej.contar(!!pts);
-  if (pts) ej.actualizar(pts, vis, t);
+  if (pts) ej.actualizar(pts, vis, t, mundo);
   else { ej.errores = []; ej.enPos = false; }
 
   fps = 0.9 * fps + 0.1 * (1000 / Math.max(ahora - tFps, 1)); tFps = ahora;
