@@ -1,0 +1,11 @@
+<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Todas las animaciones</title>
+<style>body{font-family:system-ui,sans-serif;background:#F4F7F5;color:#0E3A44;margin:0;padding:16px}
+.g{display:grid;grid-template-columns:repeat(auto-fill,minmax(360px,1fr));gap:12px}
+.c{background:#fff;border:1px solid #D6E1E1;border-radius:12px;padding:10px}.c h3{margin:0 0 6px;font-size:14px}
+.anim svg{width:100%;height:auto;max-height:260px;background:#EAF1F2;border-radius:10px;display:block}
+.anim figcaption{display:flex;flex-direction:column;font-size:13px}.anim-cue{font-weight:700}.anim-mus{color:#E4572E;font-size:12px}</style></head>
+<body><h1 style="font-size:18px">Todas las animaciones</h1><div class="g" id="g"></div>
+<script src="../anim.js"></script><script>
+document.getElementById("g").innerHTML=ANIM.ids().map(id=>`<div class="c"><h3>${id}</h3>${ANIM.html(id)}</div>`).join(""); ANIM.iniciar();
+</script></body></html>
