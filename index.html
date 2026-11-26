@@ -128,6 +128,15 @@ h2{font-family:var(--f-display);font-weight:700;font-size:22px;letter-spacing:.0
 .amrap button{width:56px;height:56px;border-radius:50%;border:2px solid currentColor;background:none;color:inherit;font-size:26px;font-weight:700;cursor:pointer}
 .amrap b{font-family:var(--f-num);font-size:44px;min-width:70px}
 .circ{font-size:16px;opacity:.9;margin:0;padding:0;list-style:none}
+/* animaciones de ejercicios */
+.anim{margin:4px 0 8px;display:flex;flex-direction:column;gap:4px}
+.anim svg{display:block;width:100%;max-width:340px;height:auto;max-height:220px;background:#EAF1F2;border-radius:12px}
+.anim figcaption{display:flex;flex-direction:column;gap:1px;font-size:14px}
+.anim .anim-cue{font-weight:700}
+.anim .anim-mus{color:#E4572E;font-weight:600;font-size:13px}
+.anim.t{align-items:center;margin:0}
+.anim.t svg{width:min(78vw,320px);max-height:26vh}
+.anim.t .anim-mus{color:inherit;opacity:.85}
 
 /* modal */
 .modal{position:fixed;inset:0;z-index:30;background:color-mix(in srgb,var(--ink) 55%,transparent);display:flex;align-items:flex-end;justify-content:center;padding:16px}
@@ -165,6 +174,7 @@ h2{font-family:var(--f-display);font-weight:700;font-size:22px;letter-spacing:.0
 <script src="rutina.js"></script>
 <script src="catalogo.js"></script>
 <script src="reglas.js"></script>
+<script src="anim.js"></script>
 <script>
 let R = window.RUTINA;
 const $ = id => document.getElementById(id);
@@ -286,7 +296,9 @@ function exHTML(st,bi,ii,it){
       <div class="sets">${Array.from({length:nSets(it)},(_,s)=>{ const on=st.done[`${k}-${s}`];
       return `<button class="set ${on?"on":""} ${timed?"timed":""}" data-set="${k}-${s}" aria-pressed="${!!on}" aria-label="${word} ${s+1}">${on?"✓":s+1}</button>`; }).join("")}</div>`;
   }
-  const extra = (it.claves?.length||it.facil||it.dificil||it.video) ? `<details class="more" data-more="${k}" ${openMore.has(k)?"open":""}><summary>Cómo se hace</summary>
+  const anim = window.ANIM?.tiene(it.ej) ? ANIM.html(it.ej) : "";
+  const extra = (anim||it.claves?.length||it.facil||it.dificil||it.video) ? `<details class="more" data-more="${k}" ${openMore.has(k)?"open":""}><summary>Cómo se hace</summary>
+      ${anim}
       ${it.claves?.length?`<ul>${it.claves.map(c=>`<li>${esc(c)}</li>`).join("")}</ul>`:""}
       ${it.facil?`<p><b>Más fácil:</b> ${esc(it.facil)}</p>`:""}${it.dificil?`<p><b>Más difícil:</b> ${esc(it.dificil)}</p>`:""}
       ${/^https:\/\/youtu\.be\//.test(it.video||"")?`<p><a class="vid" href="${esc(it.video)}" target="_blank" rel="noopener">▶ Ver video</a></p>`:""}</details>` : "";
@@ -625,6 +637,7 @@ function drawTimer(){
       <div class="ph">${esc(p.label)}</div>
       <div class="clock ${manual?"up":""}">${mmss(manual?Math.floor(shown):Math.ceil(shown))}</div>
       ${p.info?`<div class="info">${esc(p.info)}</div>`:""}
+      ${p.kind!=="work"&&window.ANIM?.tiene(p.ej)?ANIM.html(p.ej,"t"):""}
       ${p.circuit&&!p.amrap?`<ul class="circ">${p.circuit.map(c=>`<li>${esc(c)}</li>`).join("")}</ul>`:""}
       ${p.amrap?`<ul class="circ">${p.circuit.map(c=>`<li>${esc(c)}</li>`).join("")}</ul>
         <div class="amrap"><button data-t="minus" aria-label="Restar ronda">−</button><b>${T.rounds}</b><button data-t="plus" aria-label="Sumar ronda">+</button></div><div class="next">Rondas completas</div>`:""}
@@ -653,10 +666,10 @@ $("timer").addEventListener("click",e=>{
 /* ---------- armado de las secuencias ---------- */
 function leadPhase(it,s,{first,blockName,secs}){
   const nx=intro(it,s), detail=(s===0||first)?clavesTxt(it):"";
-  if(first) return {label:"Preparate",secs,kind:"prep",info:`Primero: ${it.nombre}`,
+  if(first) return {label:"Preparate",secs,kind:"prep",ej:it.ej,info:`Primero: ${it.nombre}`,
     say:`${blockName?`Arrancamos con ${blockName}. `:""}Primero: ${nx}`, sayLong:`${blockName?`Arrancamos con ${blockName}. `:""}Primero: ${nx}${detail}`};
   const word = s>0 ? "Descanso" : "Cambio";
-  return {label:s>0?"Descanso":"Cambio de ejercicio",secs,kind:"rest",info:`Sigue: ${it.nombre}${!isInterval(it)&&nSets(it)>1?` · ${isCirc(it)?"vuelta":"serie"} ${s+1} de ${nSets(it)}`:""}`,
+  return {label:s>0?"Descanso":"Cambio de ejercicio",secs,kind:"rest",ej:it.ej,info:`Sigue: ${it.nombre}${!isInterval(it)&&nSets(it)>1?` · ${isCirc(it)?"vuelta":"serie"} ${s+1} de ${nSets(it)}`:""}`,
     say:`${word}. Lo que sigue: ${nx}`, sayLong:`${word}. Lo que sigue: ${nx}${detail}`};
 }
 function workPhases(bi,ii,it,s){
@@ -666,7 +679,7 @@ function workPhases(bi,ii,it,s){
     say: it.seg ? "¡Vamos!" : "¡Vamos! Tocá Listo cuando termines.", key}];
   if(isCirc(it)){ const ex=it.ejercicios, ph=[], pausa=it.pausa??5;
     ex.forEach((e,j)=>{
-      if(j>0) ph.push({label:"Cambio",secs:pausa,kind:"rest",info:`Viene: ${e.nombre} · ${circDose(e)}`,say:`${e.nombre}.`});
+      if(j>0) ph.push({label:"Cambio",secs:pausa,kind:"rest",ej:e.ej,info:`Viene: ${e.nombre} · ${circDose(e)}`,say:`${e.nombre}.`});
       const info=`${circDose(e)} · vuelta ${s+1} de ${it.vueltas}`;
       ph.push(e.seg ? {label:e.nombre,secs:e.seg,kind:"work",info,say:j?"¡Vamos!":`${e.nombre}. ¡Vamos!`}
                     : {label:e.nombre,secs:null,kind:"work",info,say:`${j?"":e.nombre+". "}Tocá Listo cuando termines.`}); });
@@ -715,7 +728,7 @@ function runRest(ses,bi,ii,nextSet){
   runTimer({title:"Descanso", phases:[leadPhase(it,nextSet,{secs:it.descanso})], endSay:`¡Vamos! Serie ${nextSet+1}.`});
 }
 
-render(); keepAwake();
+render(); keepAwake(); window.ANIM?.iniciar();
 if("serviceWorker" in navigator && (location.protocol==="https:" || location.hostname==="localhost")) navigator.serviceWorker.register("sw.js").catch(()=>{});
 </script>
 </body>

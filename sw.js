@@ -1,7 +1,7 @@
 /* Modo sin conexión: siempre intenta bajar lo último (así llega la rutina nueva)
    y si no hay señal usa la copia guardada. */
-const CACHE = "cer-v4";
-const FILES = ["./", "index.html", "rutina.js", "catalogo.js", "reglas.js", "logo.webp", "manifest.webmanifest"];
+const CACHE = "cer-v5";
+const FILES = ["./", "index.html", "rutina.js", "catalogo.js", "reglas.js", "anim.js", "logo.webp", "manifest.webmanifest"];
 
 self.addEventListener("install", e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(FILES.map(f => new Request(f, { cache: "no-cache" })))).then(() => self.skipWaiting()));
