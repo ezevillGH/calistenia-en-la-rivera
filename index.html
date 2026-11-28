@@ -11,7 +11,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Calistenia">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Barlow:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800&family=Poppins:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap">
 <style>
 /* Layout: una columna tipo app de celular; el temporizador ocupa toda la pantalla.
    Colores del logo: azul petróleo (barra y atleta), celeste (río), verde (costanera). */
@@ -19,7 +19,7 @@
   --bg:#0B0F10; --surface:#161C1E; --surface-2:#1F272A; --ink:#F2F5F4; --muted:#8C999B; --line:#2A3437;
   --accent:#A6E35A; --accent-ink:#0B0F10; --chalk:#58B3D3; --chalk-ink:#06222B; --done:#A6E35A; --warn:#FF7A59;
   --f-display:"Barlow Condensed","Arial Narrow",system-ui,sans-serif;
-  --f-body:"Barlow",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-body:"Poppins",system-ui,-apple-system,"Segoe UI",sans-serif;
   --f-num:"JetBrains Mono",ui-monospace,Consolas,monospace;
   color-scheme:dark;
 }
@@ -126,12 +126,12 @@ h2{font-family:var(--f-display);font-weight:700;font-size:22px;letter-spacing:.0
 .circ{font-size:16px;opacity:.9;margin:0;padding:0;list-style:none}
 /* animaciones de ejercicios */
 .anim{margin:4px 0 8px;display:flex;flex-direction:column;gap:4px}
-.anim svg{display:block;width:100%;max-width:340px;height:auto;max-height:220px;background:#EAF1F2;border-radius:12px}
+.anim>svg{display:block;width:100%;max-width:340px;height:auto;max-height:220px;background:#EAF1F2;border-radius:12px}
 .anim figcaption{display:flex;flex-direction:column;gap:1px;font-size:14px}
 .anim .anim-cue{font-weight:700}
 .anim .anim-mus{color:#E4572E;font-weight:600;font-size:13px}
 .anim.t{align-items:center;margin:0}
-.anim.t svg{width:min(78vw,320px);max-height:26vh}
+.anim.t>svg{width:min(78vw,320px);max-height:26vh}
 .anim.t .anim-mus{color:inherit;opacity:.85}
 
 /* ---- tema oscuro (referencia UI kit): tarjetas, píldoras, acento lima ---- */
@@ -180,15 +180,113 @@ h2{font-size:30px;font-weight:800;letter-spacing:.01em}
 .timer.prep{background:var(--surface);color:var(--ink)}
 .timer .ph{font-size:clamp(28px,8vw,46px);font-weight:800}
 .timer .clock{font-family:var(--f-display);font-weight:800;font-size:clamp(110px,38vw,220px)}
-.anim svg{background:#1A2124}
+.anim>svg{background:#1A2124}
 .anim .anim-mus{color:var(--accent)}
-.timer:not(.prep) .anim svg{background:#0B0F10}
+.timer:not(.prep) .anim>svg{background:#0B0F10}
 .timer:not(.prep) .anim .anim-mus{color:inherit}
 .sheet{border-radius:22px 22px 16px 16px}
 .sheet h2{color:var(--accent)}
 .profe{border-color:var(--line);background:var(--surface);border-radius:22px}
 .edit,.add{border-color:var(--line)}
 .form input,.form select{border-color:var(--line);background:var(--surface-2)}
+
+/* ---- retoque 2: componentes del UI kit ---- */
+h1,h2,.scard .t,.bhead h3,.htxt b,.sheet h2{text-transform:none;letter-spacing:0}
+h1{font:700 21px/1.15 var(--f-body)}
+h2{font:700 22px/1.2 var(--f-body)}
+h2 small,.bhead h3 small{color:var(--muted);font-weight:500;font-size:.75em}
+.label{font-size:11px;font-weight:600;letter-spacing:.1em}
+.small{font-size:13px}
+.hello{display:flex;justify-content:space-between;align-items:center;gap:12px;padding-top:4px}
+.hello .brand{gap:12px}
+.hello .muted{font-size:14px}
+.emblem{width:52px;height:52px;border-radius:50%;background-size:88px 88px;background-position:-17px -8px}
+.ib{flex:none;width:44px;height:44px;border-radius:50%;border:0;background:var(--surface);color:var(--ink);display:grid;place-items:center;cursor:pointer}
+.chips{display:flex;gap:8px;overflow-x:auto;margin:16px -16px 0;padding:0 16px 2px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;height:38px;padding:0 16px;border-radius:999px;border:1.5px solid var(--line);background:none;color:var(--ink);font:500 14px var(--f-body);cursor:pointer}
+.chip.on{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-weight:600}
+.today{margin-top:16px;width:100%;display:flex;align-items:stretch;gap:0;text-align:left;border:0;cursor:pointer;border-radius:24px;overflow:hidden;color:var(--ink);
+  background:radial-gradient(120% 90% at 100% 0%,color-mix(in srgb,var(--accent) 14%,transparent),transparent 60%),var(--surface);padding:0}
+.today .tt{flex:1;display:flex;flex-direction:column;gap:6px;padding:18px 0 18px 18px;min-width:0}
+.today.done .tt{padding:18px}
+.today b{font:700 24px/1.1 var(--f-body)}
+.today .pic{flex:none;width:44%;max-width:200px;display:flex;align-items:center}
+.today .pic svg{width:100%;height:auto;display:block}
+.today .pic svg>rect:first-child{fill:transparent}
+.tags{display:flex;flex-wrap:wrap;gap:6px}
+.tags span{font-size:12px;font-weight:500;color:var(--chalk);background:color-mix(in srgb,var(--chalk) 14%,transparent);padding:3px 10px;border-radius:999px}
+.meta{display:flex;gap:14px;flex-wrap:wrap;font-size:13px;color:var(--muted)}
+.meta span{display:inline-flex;align-items:center;gap:5px}
+.meta svg{color:var(--accent)}
+.cta{align-self:flex-start;margin-top:6px;display:inline-flex;align-items:center;gap:10px;height:46px;padding:0 6px 0 20px;border-radius:999px;border:0;background:var(--accent);color:var(--accent-ink);font:600 15px var(--f-body);cursor:pointer}
+.cta i{width:34px;height:34px;border-radius:50%;background:var(--accent-ink);color:var(--accent);display:grid;place-items:center}
+.cta.big{align-self:stretch;justify-content:space-between;height:54px;font-size:16px;margin-top:4px}
+.cta.big i{width:42px;height:42px;flex:none}
+.cta .cl{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.prog{margin-top:12px;display:flex;align-items:center;gap:8px;background:var(--surface);border-radius:24px;padding:4px 16px 4px 0}
+.prog .hero{margin:0;background:none;flex:1;min-width:0;padding:12px 0 12px 16px;gap:12px}
+.prog .ring{width:76px;height:76px}
+.prog .htxt b{font:700 15px/1.25 var(--f-body);text-transform:none}
+.prog .htxt .label{font-size:10px}
+.wbars{display:flex;gap:5px;align-items:flex-end;height:74px;flex:none}
+.wb{display:flex;flex-direction:column;align-items:center;gap:4px;height:100%}
+.wb span{flex:1;width:9px;border-radius:5px;background:var(--surface-2);display:flex;align-items:flex-end;overflow:hidden}
+.wb i{display:block;width:100%;border-radius:5px;background:transparent}
+.wb i.on{background:var(--accent)}
+.wb small{font-size:10px;color:var(--muted);font-weight:600}
+.wb.hoy small{color:var(--accent)}
+.sec{margin-top:24px;display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap}
+.list{gap:10px;margin-top:12px}
+.srow{display:flex;align-items:center;gap:14px;width:100%;text-align:left;border:0;background:var(--surface);color:var(--ink);border-radius:20px;padding:12px 12px 12px 12px;cursor:pointer}
+.srow.done{box-shadow:inset 0 0 0 1.5px var(--accent)}
+.srow .info{flex:1;display:flex;flex-direction:column;gap:4px;min-width:0}
+.srow b{font:600 17px/1.2 var(--f-body)}
+.srow .muted{font-size:13px}
+.srow .status{font-size:12px;font-weight:500;color:var(--muted)}
+.srow .status.ok{color:var(--accent)}
+.go-i{color:var(--muted);flex:none}
+.thumb{flex:none;width:64px;height:64px;border-radius:16px;background:#1A2124;overflow:hidden;display:grid;place-items:center;color:var(--accent)}
+.thumb svg{width:100%;height:100%;display:block}
+.ex .thumb{width:56px;height:56px;border-radius:14px}
+.nav{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.nav>span{font-weight:600;font-size:16px}
+.nav>i{width:44px}
+.shead{margin-top:14px;background:var(--surface);border-radius:24px;padding:18px;gap:8px}
+.trio{display:grid;grid-template-columns:repeat(3,1fr);margin:6px 0 4px;background:var(--surface-2);border-radius:18px;padding:12px 0}
+.trio div{display:flex;flex-direction:column;align-items:center;gap:2px}
+.trio div+div{border-left:1px solid var(--line)}
+.trio b{font:800 26px/1 var(--f-display)}
+.trio span{font-size:12px;color:var(--muted)}
+.bhead{align-items:center;margin-bottom:6px}
+.bhead h3{font:700 18px/1.2 var(--f-body);margin-top:2px}
+.play{width:auto;margin:0;height:38px;min-height:0;padding:0 14px 0 6px;gap:6px;align-items:center;flex-wrap:nowrap;font:600 14px var(--f-body);border-radius:999px}
+.play svg{width:26px;height:26px;padding:6px;border-radius:50%;background:var(--accent-ink);color:var(--accent);box-sizing:border-box}
+.okb{flex:none;width:28px;height:28px;border-radius:50%;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center}
+.exh{align-items:center;gap:12px}
+.exh .nd{flex:1;display:flex;flex-direction:column;gap:2px;min-width:0}
+.exh .n{font:600 16px/1.25 var(--f-body)}
+.exh .dose{font:500 12px var(--f-num);padding:0;white-space:normal}
+.ph-i{color:var(--muted)}
+.ex.complete .thumb{opacity:.5}
+.set{height:42px;font-size:14px}
+.ilist{padding-left:84px;color:var(--muted);font-size:14px}
+.ex .sets{padding-left:68px}
+.more{padding-left:68px}
+.more summary{display:inline-flex;align-items:center;height:32px;padding:0 14px;border-radius:999px;border:1.5px solid var(--line);color:var(--ink);font-weight:500;font-size:13px}
+.more summary::before{content:"+";margin-right:6px;color:var(--accent);font-weight:700}
+.more[open] summary::before{content:"−"}
+.anim figcaption{gap:8px}
+.anim .anim-mus{display:flex;flex-wrap:wrap;gap:6px}
+.mchip{display:inline-flex;align-items:center;gap:6px;height:30px;padding:0 12px 0 6px;border-radius:999px;border:1.5px solid var(--accent);color:var(--ink);font:500 12px var(--f-body)}
+.mchip i{width:18px;height:18px;border-radius:50%;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;font-style:normal}
+.mchip i svg{width:11px;height:11px}
+.timer .anim .mchip{border-color:currentColor;color:inherit}
+.timer .anim .mchip i{background:none;color:inherit;box-shadow:inset 0 0 0 1.5px currentColor}
+.timer .tt{font-family:var(--f-body)}
+.timer .ph{font-family:var(--f-body);font-weight:700;text-transform:none;letter-spacing:0;font-size:clamp(26px,7.5vw,40px)}
+.timer .ctl button{font-family:var(--f-body);font-weight:600}
+@media (max-width:400px){ .ex .sets,.more{padding-left:0} .ilist{padding-left:18px} .wbars{gap:4px} .wb span{width:7px} .prog .hero{gap:10px;padding-left:12px} .prog .ring{width:66px;height:66px} .prog .htxt .muted{display:none} }
 
 /* modal */
 .modal{position:fixed;inset:0;z-index:30;background:color-mix(in srgb,var(--ink) 55%,transparent);display:flex;align-items:flex-end;justify-content:center;padding:16px}
@@ -309,6 +407,33 @@ function renderNiveles(){
   window.scrollTo(0,0);
 }
 const vozBtn = () => window.speechSynthesis ? `<button class="voz ${voz==="apagada"?"off":""}" data-voz aria-label="Cambiar narración">Voz: ${voz}</button>` : "";
+const ICO={
+  play:'<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M8 5.5v13l11-6.5z" fill="currentColor"/></svg>',
+  back:'<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+  chev:'<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+  clock:'<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 7.5V12l3 2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>',
+  pesa:'<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M3 10v4M6 8v8M18 8v8M21 10v4M6 12h12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>',
+  voz:'<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18V6L7.5 9.5z" fill="currentColor"/><path d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>',
+  mute:'<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18V6L7.5 9.5z" fill="currentColor"/><path d="M16 9.5l5 5M21 9.5l-5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>',
+  check:'<svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+};
+const NIV_CORTO={basico:"Básico","int-sup":"Inter. superior","int-inf":"Inter. inferior",avanzado:"Avanzado"};
+/* minutos estimados de una sesión (misma cuenta que reglas.js) */
+function minutosSes(ses){ let m=0;
+  ses.bloques.forEach(b=>b.items.forEach(it=>{
+    if(it.tipo==="reps"||it.tipo==="tiempo"){ const ps=it.tipo==="tiempo"?it.seg:(it.seg||40); m+=(it.series*ps+(it.series-1)*(it.descanso||0)+15)/60; }
+    else if(isCirc(it)){ const v=it.ejercicios.reduce((t,e)=>t+(e.seg||20)+(it.pausa??5),0); m+=(it.vueltas*v+(it.vueltas-1)*(it.descanso||0)+15)/60; }
+    else m+=(it.tipo==="tabata"?it.rondas*(it.trabajo+it.pausa):it.minutos*60)/60+.5; }));
+  return Math.round(m/5)*5; }
+const nEjercicios = ses => ses.bloques.filter(b=>b.tipo==="principal"||b.tipo==="fuerza").reduce((t,b)=>t+b.items.reduce((u,it)=>u+(it.ejs?.length||(isCirc(it)?it.ejercicios.length:1)),0),0);
+const primerEj = ses => { for(const b of ses.bloques.filter(b=>b.tipo==="principal")) for(const it of b.items){ for(const id of (it.ejs||[it.ej])) if(window.ANIM?.tiene(id)) return id; } return null; };
+const icoBtn = (attrs,ico,label) => `<button class="ib" ${attrs} aria-label="${label}">${ico}</button>`;
+function semanaBarras(){
+  const hist=store.get("bl:hist",[]), hoy=new Date(), lun=new Date(hoy.getFullYear(),hoy.getMonth(),hoy.getDate()-((hoy.getDay()+6)%7));
+  const c=[0,0,0,0,0,0,0]; hist.forEach(h=>{ const d=new Date(h.fin), i=Math.floor((new Date(d.getFullYear(),d.getMonth(),d.getDate())-lun)/864e5); if(i>=0&&i<7) c[i]++; });
+  const max=Math.max(2,...c), hi=(hoy.getDay()+6)%7;
+  return `<div class="wbars" aria-label="Sesiones por día de esta semana">${["L","M","M","J","V","S","D"].map((d,i)=>`<div class="wb ${i===hi?"hoy":""}"><span><i style="height:${Math.max(8,Math.round(100*c[i]/max))}%" class="${c[i]?"on":""}"></i></span><small>${d}</small></div>`).join("")}</div>`;
+}
 function hero(hechas,total,historico){
   const pct=total?hechas/total:0, r=34, c=2*Math.PI*r;
   return `<div class="hero"><svg viewBox="0 0 84 84" class="ring" aria-hidden="true"><circle cx="42" cy="42" r="${r}" class="rb"/><circle cx="42" cy="42" r="${r}" class="rf" ${pct?"":"style=\"display:none\""} stroke-dasharray="${(c*pct).toFixed(1)} ${c.toFixed(1)}"/>
@@ -320,18 +445,31 @@ function renderHome(){
   const sesiones = SES();
   const doneThisWeek = sesiones.filter(s=>loadS(s.id).endAt).length;
   const cicloTxt = R.ciclo ? `Ciclo ${R.ciclo} · semana ${R.semanaCiclo} de 4${R.descarga?" · descarga":""}` : "Rutina de la semana";
+  const prox = sesiones.find(s=>!loadS(s.id).endAt), anim = prox && primerEj(prox);
+  const pst = prox && loadS(prox.id), pp = prox && progress(prox,pst);
   $("app").innerHTML = `
-    <div class="top"><div class="brand"><div class="emblem" role="img" aria-label="Logo"></div><h1>Calistenia<small>en la Rivera<i>Mercedes</i></small></h1></div>${R.ejemplo?'<span class="badge">Rutina de ejemplo</span>':""}</div>
-    <div class="week"><div class="row"><span class="label">${esc(cicloTxt)}</span>${vozBtn()}</div><h2>${esc(R.semana)}</h2>
-      ${NIVELES.length?`<button class="nivel" data-goto-nivel>Nivel: <b>${esc(nivelNombre())}</b> · cambiar</button>`:""}
-      ${R.descarga?`<span class="muted">Semana liviana: menos volumen para que el cuerpo asimile. Es parte del plan.</span>`:""}</div>
-    ${hero(doneThisWeek,sesiones.length,hist.length)}
-    <div class="list">${sesiones.map(s=>{ const st=loadS(s.id), p=progress(s,st);
-      return `<button class="scard ${st.endAt?"done":""}" data-open="${esc(s.id)}">
-        <span class="t">${esc(s.nombre)}</span>${focoDe(s)?`<span class="foco">${esc(focoDe(s))}</span>`:""}<span class="muted">${esc(s.sub||"")}</span>
-        <span class="bar"><i style="width:${p.t?Math.round(100*p.d/p.t):0}%"></i></span>
-        <span class="row"><span class="status ${st.endAt?"ok":""}">${st.endAt?`✓ Completada el ${fecha(st.endAt)}`:p.d?`En curso · ${p.d}/${p.t} series`:"Sin empezar"}</span><span class="pill">${st.endAt?"Ver":p.d?"Seguir":"Empezar"} ▸</span></span>
-      </button>`; }).join("")}</div>
+    <header class="hello"><div class="brand"><div class="emblem" role="img" aria-label="Calistenia en la Rivera"></div>
+      <div><span class="muted">¡Hola! 👋</span><h1>¿Listos para entrenar?</h1></div></div>
+      ${window.speechSynthesis?icoBtn('data-voz', voz==="apagada"?ICO.mute:ICO.voz, "Narración: "+voz):""}</header>
+    ${NIVELES.length?`<div class="chips" role="group" aria-label="Nivel">${NIVELES.map(n=>`<button class="chip ${n.id===nivel?"on":""}" data-nivel="${esc(n.id)}" aria-pressed="${n.id===nivel}">${esc(NIV_CORTO[n.id]||n.nombre)}</button>`).join("")}</div>`:""}
+    ${R.ejemplo?'<span class="badge">Rutina de ejemplo</span>':""}
+    ${prox?`<button class="today" data-open="${esc(prox.id)}">
+      <div class="tt"><span class="label">${pp.d?"Seguí con":"Hoy toca"}</span><b>${esc(prox.nombre)}</b>
+        ${focoDe(prox)?`<span class="tags"><span>${esc(focoDe(prox))}</span></span>`:""}
+        <span class="meta"><span>${ICO.pesa} ${nEjercicios(prox)} ejercicios</span><span>${ICO.clock} ${minutosSes(prox)} min</span></span>
+        <span class="cta">${pp.d?"Seguir":"Empezar"} <i>${ICO.play}</i></span></div>
+      ${anim?`<div class="pic">${ANIM.svg(anim)}</div>`:""}</button>`
+    :`<div class="today done"><div class="tt"><span class="label">Semana completa</span><b>¡Buen trabajo!</b><span class="muted">Hiciste todas las sesiones. Nos vemos el sábado.</span></div></div>`}
+    <div class="prog">${hero(doneThisWeek,sesiones.length,hist.length)}${semanaBarras()}</div>
+    <div class="sec"><h2>Sesiones <small>(${sesiones.length})</small></h2><span class="label">${esc(cicloTxt)}</span></div>
+    ${R.descarga?`<p class="muted">Semana liviana: menos volumen para que el cuerpo asimile. Es parte del plan.</p>`:""}
+    <div class="list">${sesiones.map(s=>{ const st=loadS(s.id), p=progress(s,st), a=primerEj(s);
+      return `<button class="srow ${st.endAt?"done":""}" data-open="${esc(s.id)}">
+        <span class="thumb">${a?ANIM.mini(a):ICO.pesa}</span>
+        <span class="info"><b>${esc(s.nombre)}</b><span class="muted">${focoDe(s)?esc(focoDe(s))+" · ":""}${minutosSes(s)} min</span>
+          <span class="bar"><i style="width:${p.t?Math.round(100*p.d/p.t):0}%"></i></span>
+          <span class="status ${st.endAt?"ok":""}">${st.endAt?`✓ Completada el ${fecha(st.endAt)}`:p.d?`En curso · ${p.d}/${p.t} series`:"Sin empezar"}</span></span>
+        <span class="go-i">${ICO.chev}</span></button>`; }).join("")}</div>
     ${profeBar()}
     <div class="reset">${profe?"":`<button class="link" data-profe-in>Modo profe</button>`}</div>`;
   window.scrollTo(0,0);
@@ -358,20 +496,24 @@ function exHTML(st,bi,ii,it){
       ${it.facil?`<p><b>Más fácil:</b> ${esc(it.facil)}</p>`:""}${it.dificil?`<p><b>Más difícil:</b> ${esc(it.dificil)}</p>`:""}
       ${/^https:\/\/youtu\.be\//.test(it.video||"")?`<p><a class="vid" href="${esc(it.video)}" target="_blank" rel="noopener">▶ Ver video</a></p>`:""}</details>` : "";
   const ed = profe ? `<button class="edit" data-edit="${k}" aria-label="Editar ${esc(it.nombre)}">✎</button>` : "";
-  return `<div class="ex ${complete?"complete":""}"><div class="exh"><span class="n">${esc(it.nombre)}</span><span class="row"><span class="dose">${esc(dose(it))}</span>${ed}</span></div>${ctl}${extra}</div>`;
+  const th = window.ANIM?.tiene(it.ej) ? ANIM.mini(it.ej) : (it.ejs||[]).find(id=>window.ANIM?.tiene(id)) ? ANIM.mini(it.ejs.find(id=>ANIM.tiene(id))) : `<span class="ph-i">${ICO.pesa}</span>`;
+  return `<div class="ex ${complete?"complete":""}"><div class="exh"><span class="thumb">${th}</span><span class="nd"><span class="n">${esc(it.nombre)}</span><span class="dose">${esc(dose(it))}</span></span>${ed}${complete?`<span class="okb">${ICO.check}</span>`:""}</div>${ctl}${extra}</div>`;
 }
 function renderSession(ses){
   const st=loadS(ses.id), p=progress(ses,st);
   const mainDone = blockDone(st,ses,b=>b.tipo!=="calma");
   $("app").innerHTML = `
-    <button class="back" data-home>← Semana</button>
-    <div class="shead"><div class="row"><span class="label">${esc(R.semana)}</span>${vozBtn()}</div><h2>${esc(ses.nombre)}</h2>${focoDe(ses)?`<span class="foco">${esc(focoDe(ses))}</span>`:""}<span class="muted">${esc(ses.sub||"")}</span>
-      <span class="bar"><i style="width:${p.t?Math.round(100*p.d/p.t):0}%"></i></span></div>
+    <header class="nav">${icoBtn("data-home",ICO.back,"Volver a la semana")}<span>${esc(ses.nombre)}</span>${window.speechSynthesis?icoBtn('data-voz', voz==="apagada"?ICO.mute:ICO.voz, "Narración: "+voz):"<i></i>"}</header>
+    <div class="shead"><span class="label">${esc(R.semana)}</span><h2>${esc(ses.nombre)}</h2>${focoDe(ses)?`<span class="tags"><span>${esc(focoDe(ses))}</span></span>`:""}${ses.sub?`<span class="muted">${esc(ses.sub)}</span>`:""}
+      <div class="trio"><div><b>${nEjercicios(ses)}</b><span>Ejercicios</span></div><div><b>${minutosSes(ses)}</b><span>Minutos</span></div><div><b>${p.t?Math.round(100*p.d/p.t):0}%</b><span>Hecho</span></div></div>
+      <span class="bar"><i style="width:${p.t?Math.round(100*p.d/p.t):0}%"></i></span>
+      ${(()=>{ const bi=ses.bloques.findIndex((b,i)=>!b.items.every((it,ii)=>itemDone(st,i,ii,it))); return bi<0?"":`<button class="cta big" data-block="${bi}"><span class="cl">${p.d?`Seguir · ${esc(ses.bloques[bi].nombre)}`:"Arrancar la sesión"}</span> <i>${ICO.play}</i></button>`; })()}
+      <span class="muted small">${voz==="apagada"?"Cada bloque corre solo, sin voz.":"Cada bloque corre solo y la voz te va guiando."}</span></div>
     ${profeBar()}
     ${ses.bloques.map((b,bi)=>`
       ${b.tipo==="calma"&&mainDone?`<div class="banner"><b>Entrenamiento concluido</b><span>${st.endAt?"Sesión terminada. Buen trabajo.":"Ahora, la vuelta a la calma."}</span></div>`:""}
-      <section class="block ${b.tipo}" id="b${bi}"><div class="bhead"><h3>${esc(b.nombre)}</h3><span class="label">${{entrada:"Entrada en calor",principal:"Rutina",fuerza:"Fuerza",cierre:"Cierre",calma:"Calma"}[b.tipo]||""}</span></div>
-      ${b.items.every((it,ii)=>itemDone(st,bi,ii,it))?"":`<button class="play" data-block="${bi}">▶ Reproducir bloque<small>${voz==="apagada"?"corre solo":"corre solo, con voz"}</small></button>`}
+      <section class="block ${b.tipo}" id="b${bi}"><div class="bhead"><div>${(t=>t&&t.toLowerCase()!==b.nombre.toLowerCase()?`<span class="label">${t}</span>`:"")({entrada:"Entrada en calor",principal:"Rutina",fuerza:"Fuerza",cierre:"Cierre",calma:"Calma"}[b.tipo])}<h3>${esc(b.nombre)} <small>(${b.items.length})</small></h3></div>
+      ${b.items.every((it,ii)=>itemDone(st,bi,ii,it))?`<span class="okb">${ICO.check}</span>`:`<button class="play" data-block="${bi}" aria-label="Reproducir bloque">${ICO.play}<span>Bloque</span></button>`}</div>
       ${b.items.map((it,ii)=>exHTML(st,bi,ii,it)).join("")}
       ${profe&&b.tipo!=="cierre"?`<button class="add" data-add="${bi}">+ Agregar ${b.tipo==="entrada"?"ejercicio o circuito":"ejercicio"}</button>`:""}</section>`).join("")}
     <div class="reset">${confirmReset

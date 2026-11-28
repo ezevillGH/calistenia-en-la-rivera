@@ -290,8 +290,14 @@ window.ANIM={
   musculos:id=>EJ[id]?EJ[id].musculos.map(m=>NOMBRE[m[0]]):[],
   /* bloque listo para insertar: dibujo + frase técnica + músculos */
   html:(id,clase="")=>EJ[id]?`<figure class="anim ${clase}"><svg data-anim="${id}" viewBox="${EJ[id].vb}" role="img" aria-label="Animación del ejercicio">${cuadro(id,performance.now()/1000*(lento?.4:1)).svg}</svg>
-    <figcaption><span class="anim-cue">${cuadro(id,performance.now()/1000*(lento?.4:1)).cue}</span><span class="anim-mus">Trabajan: ${ANIM.musculos(id).join(" · ")}</span></figcaption></figure>`:"",
+    <figcaption><span class="anim-cue">${cuadro(id,performance.now()/1000*(lento?.4:1)).cue}</span><span class="anim-mus" aria-label="Músculos que trabajan">${ANIM.musculos(id).map(m=>`<span class="mchip"><i><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></svg></i>${m}</span>`).join("")}</span></figcaption></figure>`:"",
   ids:()=>Object.keys(EJ),
+  /* dibujo animado suelto (sin textos) */
+  svg:id=>EJ[id]?`<svg data-anim="${id}" viewBox="${EJ[id].vb}" role="img" aria-label="Animación del ejercicio">${cuadro(id,performance.now()/1000).svg}</svg>`:"",
+  /* miniatura fija en el momento de más esfuerzo, encuadrada en cuadrado */
+  mini:id=>{ const e=EJ[id]; if(!e) return ""; const k=e.keys.reduce((m,x)=>(x.pose.act??0)>(m.pose.act??0)?x:m,e.keys[0]);
+    const [x,y,w,h]=e.vb.split(" ").map(Number), sz=Math.max(h,(w+h)/2*.85), cx=x+w/2, cy=y+h/2;
+    return `<svg viewBox="${(cx-sz/2).toFixed(1)} ${(cy-sz/2).toFixed(1)} ${sz.toFixed(1)} ${sz.toFixed(1)}" aria-hidden="true">${cuadro(id,k.t).svg}</svg>`; },
   iniciar(){ if(!corriendo){ corriendo=true; requestAnimationFrame(frame); } }
 };
 })();
