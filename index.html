@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#0E3A44">
+<meta name="theme-color" content="#0B0F10">
 <title>Calistenia en la Rivera</title>
 <link rel="icon" href="logo.webp">
 <link rel="apple-touch-icon" href="logo.webp">
@@ -11,21 +11,18 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Calistenia">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700&family=Barlow:wght@400;500;600&family=JetBrains+Mono:wght@500;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Barlow:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap">
 <style>
 /* Layout: una columna tipo app de celular; el temporizador ocupa toda la pantalla.
    Colores del logo: azul petróleo (barra y atleta), celeste (río), verde (costanera). */
 :root{
-  --bg:#F4F7F5; --surface:#FFFFFF; --ink:#0E3A44; --muted:#557079; --line:#D6E1E1;
-  --accent:#0E3A44; --accent-ink:#FFFFFF; --chalk:#58B3D3; --chalk-ink:#0A2C34; --done:#4E7C58;
-  --f-display:"Montserrat","Avenir Next",system-ui,sans-serif;
+  --bg:#0B0F10; --surface:#161C1E; --surface-2:#1F272A; --ink:#F2F5F4; --muted:#8C999B; --line:#2A3437;
+  --accent:#A6E35A; --accent-ink:#0B0F10; --chalk:#58B3D3; --chalk-ink:#06222B; --done:#A6E35A; --warn:#FF7A59;
+  --f-display:"Barlow Condensed","Arial Narrow",system-ui,sans-serif;
   --f-body:"Barlow",system-ui,-apple-system,"Segoe UI",sans-serif;
   --f-num:"JetBrains Mono",ui-monospace,Consolas,monospace;
-  color-scheme:light;
+  color-scheme:dark;
 }
-@media (prefers-color-scheme: dark){:root{
-  --bg:#0A1E23; --surface:#11292F; --ink:#E3EEF0; --muted:#8EA8AE; --line:#21404A;
-  --accent:#6CC3E0; --accent-ink:#0A1E23; --chalk:#58B3D3; --chalk-ink:#0A2C34; --done:#76AE7F; color-scheme:dark}}
 *{box-sizing:border-box}
 [hidden]{display:none!important}
 html,body{margin:0}
@@ -34,8 +31,7 @@ body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:1
 button{font-family:inherit;color:inherit}
 button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .brand{display:flex;align-items:center;gap:12px;min-width:0}
-.emblem{mix-blend-mode:multiply;flex:none;width:68px;height:62px;background:url(logo.webp) no-repeat;background-size:111px 111px;background-position:-21px -12px}
-@media (prefers-color-scheme: dark){.emblem{mix-blend-mode:normal;border-radius:50%;background-color:#F4F7F5;width:66px;height:66px;background-position:-22px -10px}}
+.emblem{flex:none;border-radius:16px;background:#F4F7F5 url(logo.webp) no-repeat;background-size:100px 100px;background-position:-19px -9px;width:60px;height:60px;box-shadow:0 0 0 2px var(--accent)}
 h1{margin:0;font-family:var(--f-display);font-weight:700;font-size:22px;letter-spacing:.08em;text-transform:uppercase;line-height:1.1}
 h1 small{display:block;font-weight:600;font-size:13px;letter-spacing:.24em;color:var(--chalk);margin-top:3px}
 h1 small i{font-style:normal;color:var(--done);letter-spacing:.18em;font-size:10px;display:block;margin-top:3px}
@@ -123,7 +119,7 @@ h2{font-family:var(--f-display);font-weight:700;font-size:22px;letter-spacing:.0
 .timer .ctl button.main{background:currentColor}
 .timer .ctl button.main span{color:var(--accent)}
 .timer.rest .ctl button.main span{color:var(--chalk)}
-.timer.prep .ctl button.main span{color:var(--ink)}
+.timer.prep .ctl button.main span{color:var(--surface)}
 .amrap{display:flex;align-items:center;gap:16px}
 .amrap button{width:56px;height:56px;border-radius:50%;border:2px solid currentColor;background:none;color:inherit;font-size:26px;font-weight:700;cursor:pointer}
 .amrap b{font-family:var(--f-num);font-size:44px;min-width:70px}
@@ -137,6 +133,62 @@ h2{font-family:var(--f-display);font-weight:700;font-size:22px;letter-spacing:.0
 .anim.t{align-items:center;margin:0}
 .anim.t svg{width:min(78vw,320px);max-height:26vh}
 .anim.t .anim-mus{color:inherit;opacity:.85}
+
+/* ---- tema oscuro (referencia UI kit): tarjetas, píldoras, acento lima ---- */
+h1{font-size:26px;letter-spacing:.04em;font-weight:800}
+h1 small{font-family:var(--f-body);letter-spacing:.2em}
+h1 small i{color:var(--accent)}
+h2{font-size:30px;font-weight:800;letter-spacing:.01em}
+.top{border-bottom:0;padding-bottom:6px}
+.label{color:var(--muted);letter-spacing:.12em}
+.badge{border-color:var(--accent);color:var(--accent)}
+.hero{margin-top:18px;display:flex;gap:16px;align-items:center;background:var(--surface);border-radius:22px;padding:16px 18px}
+.ring{width:92px;height:92px;flex:none;transform:rotate(0)}
+.ring .rb{fill:none;stroke:var(--surface-2);stroke-width:9}
+.ring .rf{fill:none;stroke:var(--accent);stroke-width:9;stroke-linecap:round;transform:rotate(-90deg);transform-origin:42px 42px}
+.ring .rp{fill:var(--ink);font:800 20px var(--f-display)}
+.ring .rs{fill:var(--muted);font:600 11px var(--f-num)}
+.htxt{display:flex;flex-direction:column;gap:2px;min-width:0}
+.htxt b{font:800 22px var(--f-display);text-transform:uppercase;letter-spacing:.02em;line-height:1.05}
+.scard{border:0;border-radius:22px;padding:18px;gap:10px;background:var(--surface)}
+.scard .t{font-size:24px;font-weight:800}
+.scard.done{box-shadow:inset 0 0 0 1.5px var(--accent)}
+.scard .muted{font-size:14px}
+.bar{height:8px;border-radius:4px;background:var(--surface-2)}
+.pill{display:inline-flex;align-items:center;height:34px;padding:0 16px;border-radius:999px;background:var(--accent);color:var(--accent-ink);font:700 14px var(--f-body)}
+.scard.done .pill{background:var(--surface-2);color:var(--ink)}
+.foco{color:var(--chalk);font-size:14px}
+.nivel{border:0;background:var(--surface);padding:8px 16px}
+.voz{border-color:var(--line);color:var(--ink)}
+.shead{border-bottom:0}
+.block{margin-top:22px;background:var(--surface);border-radius:22px;padding:16px 16px 6px}
+.bhead h3{font-size:20px;font-weight:800;letter-spacing:.03em}
+.block.calma .bhead h3,.block.fuerza .bhead h3{color:var(--accent)}
+.ex{border-top:1px solid var(--line)}
+.ex:last-child{border-bottom:0}
+.exh .n{font-size:18px;font-weight:700}
+.set{border-radius:999px;border:0;background:var(--surface-2);color:var(--ink);min-width:56px}
+.set.on{background:var(--accent);color:var(--accent-ink)}
+.go{border-radius:999px;font-weight:700}
+.go.on{background:var(--surface-2);color:var(--accent)}
+.play{border-radius:999px;border:0;background:var(--accent);color:var(--accent-ink)}
+.more summary{color:var(--chalk)}
+.vid{color:var(--chalk);border-color:var(--chalk)}
+.banner{background:var(--accent);color:var(--accent-ink);border-radius:22px}
+.btn{border-color:var(--line)}
+.btn.warn{border-color:var(--warn);color:var(--warn)}
+.timer.prep{background:var(--surface);color:var(--ink)}
+.timer .ph{font-size:clamp(28px,8vw,46px);font-weight:800}
+.timer .clock{font-family:var(--f-display);font-weight:800;font-size:clamp(110px,38vw,220px)}
+.anim svg{background:#1A2124}
+.anim .anim-mus{color:var(--accent)}
+.timer:not(.prep) .anim svg{background:#0B0F10}
+.timer:not(.prep) .anim .anim-mus{color:inherit}
+.sheet{border-radius:22px 22px 16px 16px}
+.sheet h2{color:var(--accent)}
+.profe{border-color:var(--line);background:var(--surface);border-radius:22px}
+.edit,.add{border-color:var(--line)}
+.form input,.form select{border-color:var(--line);background:var(--surface-2)}
 
 /* modal */
 .modal{position:fixed;inset:0;z-index:30;background:color-mix(in srgb,var(--ink) 55%,transparent);display:flex;align-items:flex-end;justify-content:center;padding:16px}
@@ -257,6 +309,12 @@ function renderNiveles(){
   window.scrollTo(0,0);
 }
 const vozBtn = () => window.speechSynthesis ? `<button class="voz ${voz==="apagada"?"off":""}" data-voz aria-label="Cambiar narración">Voz: ${voz}</button>` : "";
+function hero(hechas,total,historico){
+  const pct=total?hechas/total:0, r=34, c=2*Math.PI*r;
+  return `<div class="hero"><svg viewBox="0 0 84 84" class="ring" aria-hidden="true"><circle cx="42" cy="42" r="${r}" class="rb"/><circle cx="42" cy="42" r="${r}" class="rf" ${pct?"":"style=\"display:none\""} stroke-dasharray="${(c*pct).toFixed(1)} ${c.toFixed(1)}"/>
+    <text x="42" y="40" text-anchor="middle" class="rp">${Math.round(pct*100)}%</text><text x="42" y="56" text-anchor="middle" class="rs">${hechas}/${total}</text></svg>
+    <div class="htxt"><span class="label">Progreso de la semana</span><b>${hechas===total&&total?"¡Semana completa!":`${hechas} de ${total} sesiones`}</b><span class="muted">${historico} ${historico===1?"sesión":"sesiones"} en total</span></div></div>`;
+}
 function renderHome(){
   const hist = store.get("bl:hist",[]);
   const sesiones = SES();
@@ -267,16 +325,13 @@ function renderHome(){
     <div class="week"><div class="row"><span class="label">${esc(cicloTxt)}</span>${vozBtn()}</div><h2>${esc(R.semana)}</h2>
       ${NIVELES.length?`<button class="nivel" data-goto-nivel>Nivel: <b>${esc(nivelNombre())}</b> · cambiar</button>`:""}
       ${R.descarga?`<span class="muted">Semana liviana: menos volumen para que el cuerpo asimile. Es parte del plan.</span>`:""}</div>
+    ${hero(doneThisWeek,sesiones.length,hist.length)}
     <div class="list">${sesiones.map(s=>{ const st=loadS(s.id), p=progress(s,st);
       return `<button class="scard ${st.endAt?"done":""}" data-open="${esc(s.id)}">
         <span class="t">${esc(s.nombre)}</span>${focoDe(s)?`<span class="foco">${esc(focoDe(s))}</span>`:""}<span class="muted">${esc(s.sub||"")}</span>
         <span class="bar"><i style="width:${p.t?Math.round(100*p.d/p.t):0}%"></i></span>
-        <span class="row"><span class="status ${st.endAt?"ok":""}">${st.endAt?`✓ Completada el ${fecha(st.endAt)}`:p.d?`En curso · ${p.d}/${p.t} series`:"Sin empezar"}</span><span class="label">Abrir →</span></span>
+        <span class="row"><span class="status ${st.endAt?"ok":""}">${st.endAt?`✓ Completada el ${fecha(st.endAt)}`:p.d?`En curso · ${p.d}/${p.t} series`:"Sin empezar"}</span><span class="pill">${st.endAt?"Ver":p.d?"Seguir":"Empezar"} ▸</span></span>
       </button>`; }).join("")}</div>
-    <div class="stats">
-      <div class="stat"><span class="label">Esta semana</span><b>${doneThisWeek}/${sesiones.length}</b></div>
-      <div class="stat"><span class="label">Sesiones en total</span><b>${hist.length}</b></div>
-    </div>
     ${profeBar()}
     <div class="reset">${profe?"":`<button class="link" data-profe-in>Modo profe</button>`}</div>`;
   window.scrollTo(0,0);

@@ -5,7 +5,7 @@
    Cualquier <svg data-anim="id"> visible en la página se anima solo. */
 (function(){
 const L = { thigh:46, shin:46, torso:56, upper:31, fore:29 };
-const C = { box:"#EAF1F2", floor:"#BFD0D4", bar:"#8EA8AE", G:"#B9C7CA", GF:"#9DAEB2", ON:"#E4572E", I:"#0E3A44", A:"#1F7FA3", J:"#F4F7F5" };
+const C = { box:"#1A2124", floor:"#3A4649", bar:"#7C8A8D", G:"#4C585B", GF:"#38423F", ON:"#A6E35A", I:"#E9EFEE", A:"#58B3D3", J:"#1A2124" };
 const add=(a,b)=>({x:a.x+b.x,y:a.y+b.y}), sub=(a,b)=>({x:a.x-b.x,y:a.y-b.y}), mul=(a,k)=>({x:a.x*k,y:a.y*k});
 const len=a=>Math.hypot(a.x,a.y), unit=a=>mul(a,1/(len(a)||1)), lerpP=(a,b,t)=>({x:a.x+(b.x-a.x)*t,y:a.y+(b.y-a.y)*t});
 const rot=(a,deg)=>{ const r=deg*Math.PI/180, c=Math.cos(r), s=Math.sin(r); return {x:a.x*c-a.y*s, y:a.x*s+a.y*c}; };
